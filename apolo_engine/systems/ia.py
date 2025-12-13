@@ -6,7 +6,7 @@ das entidades não jogadoras (NPCs).
 import random
 from typing import Dict, Any
 
-from apolo_engine.entities.entidade_base import EntidadeBase
+from apolo_engine.entities.entidade import Entidade
 from apolo_engine.systems.combate import COMBATE
 from apolo_engine.systems.fisica import FISICA
 from apolo_engine.core.eventos import BARRAMENTO_DE_EVENTOS, Evento
@@ -21,7 +21,7 @@ class SistemaDeIA:
         self.entidades_controladas: Dict[str, Dict[str, Any]] = {}
         BARRAMENTO_DE_EVENTOS.assinar("TEMPO_AVANCOU", self._on_tick)
 
-    def registrar_entidade(self, entidade: EntidadeBase):
+    def registrar_entidade(self, entidade: Entidade):
         """
         Adiciona uma entidade ao controle do sistema de IA.
         """
@@ -53,17 +53,17 @@ class SistemaDeIA:
             acao = self.decidir_acao(npc, contexto)
             self.executar_acao(npc, acao, contexto)
 
-    def decidir_acao(self, npc: EntidadeBase, contexto: Dict[str, Any]) -> str:
+    def decidir_acao(self, npc: Entidade, contexto: Dict[str, Any]) -> str:
         """
         Lógica de decisão da IA.
         """
-        if npc.hp_atual < npc.hp_max * 0.3:
+        if npc.hp_atual < npc.hp_maximo * 0.3:
             return "FUGIR"
         if contexto.get("alvo_proximo"):
             return "ATACAR"
         return "PATRULHAR"
 
-    def executar_acao(self, npc: EntidadeBase, acao: str, contexto: Dict[str, Any]):
+    def executar_acao(self, npc: Entidade, acao: str, contexto: Dict[str, Any]):
         """
         Traduz a decisão da IA em ações concretas no jogo.
         """
@@ -81,7 +81,7 @@ class SistemaDeIA:
                 forca_patrulha = Vector2D(random.uniform(-1, 1), random.uniform(-1, 1)).normalizar()
                 FISICA.aplicar_forca(npc.id, forca_patrulha * 2)
 
-    def _encontrar_alvo_proximo(self, npc: EntidadeBase) -> EntidadeBase | None:
+    def _encontrar_alvo_proximo(self, npc: Entidade) -> Entidade | None:
         """
         Método auxiliar para encontrar a entidade "inimiga" mais próxima.
         Para simplificar, considera qualquer outra entidade que não seja ela mesma como um alvo potencial.
@@ -92,11 +92,10 @@ class SistemaDeIA:
         alvo_mais_proximo = None
         menor_distancia_quadrada = float('inf')
 
-        # Itera sobre todas as entidades do motor, não apenas as controladas pela IA
-        from apolo_engine.motor import ApoloEngine
-        motor = ApoloEngine() # Acessa a "instância" singleton
+        # BUG CRÍTICO CORRIGIDO: Importa a instância global MOTOR em vez de criar uma nova.
+        from apolo_engine.motor import MOTOR
 
-        for outra_entidade in motor.entidades.values():
+        for outra_entidade in MOTOR.entidades.values():
             if outra_entidade.id == npc.id or outra_entidade.hp_atual <= 0:
                 continue
 

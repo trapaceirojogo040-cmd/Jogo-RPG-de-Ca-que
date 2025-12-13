@@ -1,61 +1,99 @@
 # -*- coding: utf-8 -*-
 """
 Módulo de Recursos: Define recursos consumíveis pelas entidades,
-como Energia, Mana, Vigor, etc.
+como Energia, Mana, Vigor, etc., com regeneração baseada em delta time.
 """
-from apolo_engine.core.eventos import BARRAMENTO_DE_EVENTOS, Evento
+from datetime import datetime
+from typing import Dict, Any
 
-class Energia:
+# ============================================================
+# EXCEÇÕES
+# ============================================================
+
+class ErroDeRecurso(Exception):
+    """Exceção para erros relacionados a recursos."""
+    pass
+
+# ============================================================
+# CLASSE PRINCIPAL DE RECURSO
+# ============================================================
+
+class RecursoEnergetico:
     """
-    Recurso básico para todas as ações avançadas (Habilidades, IA, etc.).
-    A regeneração é automática ao assinar o evento de avanço de tempo.
+    Representa um recurso consumível, como energia ou mana, com regeneração
+    precisa baseada no tempo decorrido.
     """
-    def __init__(self, maxima: float, regeneracao_por_segundo: float, tipo: str = "Nexus"):
-        """
-        Args:
-            maxima (float): O valor máximo que este recurso pode atingir.
-            regeneracao_por_segundo (float): A quantidade a ser regenerada por segundo.
-            tipo (str): O nome do tipo de energia (ex: "Mana", "Vigor", "Nexus").
-        """
+    def __init__(self, maxima: float, regeneracao_por_segundo: float, tipo: str = "Energia"):
+        if maxima <= 0:
+            raise ErroDeRecurso("A capacidade máxima do recurso deve ser positiva.")
+        if regeneracao_por_segundo < 0:
+            raise ErroDeRecurso("A regeneração por segundo não pode ser negativa.")
+
         self.maxima = maxima
         self.atual = maxima
         self.regeneracao_por_segundo = regeneracao_por_segundo
         self.tipo = tipo
+        self.ultima_atualizacao = datetime.utcnow()
 
-        # Se inscreve no evento de tempo para regenerar automaticamente
-        BARRAMENTO_DE_EVENTOS.assinar("TEMPO_AVANCOU", self._on_tick)
+    def _atualizar_regeneracao(self):
+        """
+        Calcula e aplica a regeneração com base no tempo real decorrido
+        desde a última atualização.
+        """
+        agora = datetime.utcnow()
+        delta_segundos = (agora - self.ultima_atualizacao).total_seconds()
 
-    def _on_tick(self, evento: Evento):
-        """
-        Callback chamado pelo sistema de eventos para regenerar a energia.
-        """
-        delta_segundos = evento.dados.get("delta_s", 0.0)
-        self.regenerar(delta_segundos)
+        if delta_segundos > 0:
+            regenerado = delta_segundos * self.regeneracao_por_segundo
+            self.atual = min(self.maxima, self.atual + regenerado)
+            self.ultima_atualizacao = agora
 
     def consumir(self, valor: float) -> bool:
         """
-        Tenta consumir uma quantidade de energia.
-
-        Args:
-            valor (float): A quantidade a ser consumida.
-
-        Returns:
-            bool: True se o consumo foi bem-sucedido, False caso contrário.
+        Tenta consumir uma quantidade do recurso. Atualiza a regeneração antes de consumir.
+        Retorna True se o consumo foi bem-sucedido.
         """
-        if valor <= self.atual:
+        if valor < 0:
+            raise ErroDeRecurso("O valor a ser consumido não pode ser negativo.")
+
+        self._atualizar_regeneracao()
+
+        if self.atual >= valor:
             self.atual -= valor
             return True
         return False
 
-    def regenerar(self, delta_segundos: float):
-        """
-        Regenera a energia com base no tempo decorrido.
+    def adicionar(self, valor: float):
+        """Adiciona uma quantidade ao recurso, sem exceder o máximo."""
+        if valor < 0:
+            raise ErroDeRecurso("O valor a ser adicionado não pode ser negativo.")
+        self._atualizar_regeneracao()
+        self.atual = min(self.maxima, self.atual + valor)
 
-        Args:
-            delta_segundos (float): O tempo em segundos desde o último tick.
+    def alterar_maximo(self, novo_maximo: float, manter_proporcao: bool = True):
         """
-        incremento = self.regeneracao_por_segundo * delta_segundos
-        self.atual = min(self.maxima, self.atual + incremento)
+        Altera o valor máximo do recurso.
+        """
+        if novo_maximo <= 0:
+            raise ErroDeRecurso("O novo máximo deve ser um valor positivo.")
+
+        if manter_proporcao and self.maxima > 0:
+            proporcao_atual = self.atual / self.maxima
+            self.atual = novo_maximo * proporcao_atual
+        else:
+            self.atual = min(self.atual, novo_maximo)
+
+        self.maxima = novo_maximo
+
+    def obter_info(self) -> Dict[str, Any]:
+        """Retorna um dicionário com o estado atual do recurso."""
+        self._atualizar_regeneracao()
+        return {
+            "tipo": self.tipo,
+            "atual": self.atual,
+            "maxima": self.maxima,
+            "porcentagem": (self.atual / self.maxima) * 100 if self.maxima > 0 else 0
+        }
 
     def __repr__(self):
         return f"<{self.tipo}: {self.atual:.1f}/{self.maxima:.1f}>"

@@ -5,3 +5,4 @@ __pycache__/
 venv/
 *.env
 codigo_arquivado/
+.apolo_backups/

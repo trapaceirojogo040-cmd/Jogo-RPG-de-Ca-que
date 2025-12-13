@@ -7,7 +7,7 @@ from typing import Dict
 
 from apolo_engine.core.eventos import BARRAMENTO_DE_EVENTOS, Evento
 from apolo_engine.utils.vector2d import Vector2D
-from apolo_engine.entities.entidade_base import EntidadeBase
+from apolo_engine.entities.entidade import Entidade
 
 # ---------------------------------------------------------------------------------------------------------
 # Corpo Físico (Componente)
@@ -17,7 +17,7 @@ class CorpoFisico:
     """
     Componente que adiciona propriedades físicas a uma entidade.
     """
-    def __init__(self, entidade: EntidadeBase, raio_colisao: float = 1.0):
+    def __init__(self, entidade: Entidade, raio_colisao: float = 1.0):
         self.entidade_id = entidade.id
         self.posicao = Vector2D(0, 0)
         self.velocidade = Vector2D(0, 0)
@@ -39,7 +39,7 @@ class SistemaDeFisica:
         self.corpos: Dict[str, CorpoFisico] = {}
         BARRAMENTO_DE_EVENTOS.assinar("TEMPO_AVANCOU", self._on_tick)
 
-    def registrar_entidade(self, entidade: EntidadeBase, raio_colisao: float = 1.0):
+    def registrar_entidade(self, entidade: Entidade, raio_colisao: float = 1.0):
         """
         Cria um CorpoFisico para uma entidade e o adiciona ao sistema.
         """

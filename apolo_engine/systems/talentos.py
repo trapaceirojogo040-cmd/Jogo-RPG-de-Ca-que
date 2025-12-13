@@ -5,7 +5,7 @@ aplicação de bônus para as entidades.
 """
 from typing import Dict, List, NamedTuple, Optional
 
-from apolo_engine.entities.entidade_base import EntidadeBase
+from apolo_engine.entities.entidade import Entidade
 from apolo_engine.core.logger import LOGGER
 
 # ---------------------------------------------------------------------------------------------------------
@@ -58,7 +58,7 @@ class SistemaDeTalentos:
             self.arvores_de_talentos[nome_classe] = {t.nome: t for t in talentos}
             LOGGER.registrar("SistemaDeTalentos", "arvore_registrada", {"classe": nome_classe})
 
-    def registrar_entidade(self, entidade: EntidadeBase):
+    def registrar_entidade(self, entidade: Entidade):
         """
         Cria um componente de árvore de talentos para uma entidade.
         """

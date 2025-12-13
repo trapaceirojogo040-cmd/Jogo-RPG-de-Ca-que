@@ -77,7 +77,7 @@ class GuardianCodeAnalyzer:
 
     def _verificacao_semantica_global(self):
         """Verifica se classes críticas do domínio estão presentes."""
-        classes_criticas = ["ApoloEngine", "EntidadeBase", "SistemaDeCombate", "SistemaDeFisica"]
+        classes_criticas = ["ApoloEngine", "Entidade", "SistemaDeCombate", "SistemaDeFisica", "SistemaDeIA"]
         todas_as_classes = set()
         for dados in self.mapa_arquivos.values():
             todas_as_classes.update(dados["classes"])

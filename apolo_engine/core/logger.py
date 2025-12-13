@@ -1,73 +1,112 @@
 # -*- coding: utf-8 -*-
 """
 Módulo Logger: Centraliza o registro de todos os eventos e
-informações críticas do motor.
+informações críticas do motor, agora com estrutura de dados e funcionalidades avançadas.
 """
 import uuid
 from datetime import datetime
 from typing import Any, Dict, List, Optional
+from dataclasses import dataclass
+
+# ============================================================
+# ESTRUTURAS E EXCEÇÕES
+# ============================================================
+
+class ErroDeLog(Exception):
+    """Exceção para erros relacionados ao sistema de log."""
+    pass
+
+@dataclass
+class EntradaDeLog:
+    """Estrutura de dados para uma entrada de log, usando dataclass para robustez."""
+    id: str
+    origem: str
+    tipo: str
+    dados: Dict[str, Any]
+    timestamp: str
+
+    def para_dict(self) -> Dict[str, Any]:
+        """Converte a entrada de log para um dicionário."""
+        return self.to_dict() # Dataclasses já fornecem um método similar, mas vamos manter a consistência.
+
+# ============================================================
+# CLASSE PRINCIPAL DO LOGGER
+# ============================================================
 
 class MotorLogger:
     """
-    Registra eventos críticos de forma estruturada e rastreia o estado do sistema.
-    Implementado como um singleton para garantir uma única fonte de verdade para os logs.
+    Sistema de log centralizado, aprimorado com limite de tamanho,
+    filtros avançados e estatísticas.
     """
-    _instancia = None
 
-    def __init__(self):
-        self.eventos: List[Dict[str, Any]] = []
-        self._max_log = 5000  # Limite de logs para performance
-        self.log_path = "apolo_engine.log"
+    def __init__(self, tamanho_maximo: int = 5000):
+        if tamanho_maximo <= 0:
+            raise ErroDeLog("O tamanho máximo do log deve ser um número positivo.")
+        self.tamanho_maximo = tamanho_maximo
+        self.eventos: List[EntradaDeLog] = []
 
-    def registrar(self, origem: str, tipo: str, dados: Dict[str, Any]):
+    def registrar(self, origem: str, tipo: str, dados: Dict[str, Any]) -> str:
         """
-        Cria e armazena um registro de evento com timestamp.
-
-        Args:
-            origem (str): Módulo ou sistema que originou o evento (ex: "Combate", "IA").
-            tipo (str): Categoria do evento (ex: "dano_recebido", "erro_critico").
-            dados (Dict[str, Any]): Dicionário com informações detalhadas.
+        Registra um novo evento no log.
+        Retorna o ID do evento para rastreamento.
         """
-        evento = {
-            "id": str(uuid.uuid4()),
-            "origem": origem,
-            "tipo": tipo,
-            "dados": dados,
-            "timestamp": datetime.utcnow().isoformat()
+        if not origem or not tipo:
+            raise ErroDeLog("Origem e tipo são campos obrigatórios para o registro.")
+
+        id_evento = str(uuid.uuid4())
+        entrada = EntradaDeLog(
+            id=id_evento,
+            origem=origem,
+            tipo=tipo,
+            dados=dados,
+            timestamp=datetime.utcnow().isoformat()
+        )
+        self.eventos.append(entrada)
+
+        # Garante que o log não exceda o tamanho máximo
+        if len(self.eventos) > self.tamanho_maximo:
+            self.eventos = self.eventos[-self.tamanho_maximo:]
+
+        return id_evento
+
+    def consultar(self, tipo: Optional[str] = None, origem: Optional[str] = None, limite: Optional[int] = None) -> List[Dict[str, Any]]:
+        """
+        Consulta eventos no log com múltiplos filtros.
+        """
+        resultados = self.eventos
+
+        if tipo:
+            resultados = [e for e in resultados if e.tipo == tipo]
+        if origem:
+            resultados = [e for e in resultados if e.origem == origem]
+        if limite and limite > 0:
+            resultados = resultados[-limite:]
+
+        return [e.__dict__ for e in resultados]
+
+    def limpar(self) -> int:
+        """Limpa todos os eventos do log e retorna a quantidade de itens removidos."""
+        removidos = len(self.eventos)
+        self.eventos.clear()
+        return removidos
+
+    def obter_estatisticas(self) -> Dict[str, Any]:
+        """Retorna estatísticas detalhadas sobre os logs armazenados."""
+        if not self.eventos:
+            return {"total": 0, "tipos": {}, "origens": {}, "mais_recente": None}
+
+        tipos = {}
+        origens = {}
+        for evento in self.eventos:
+            tipos[evento.tipo] = tipos.get(evento.tipo, 0) + 1
+            origens[evento.origem] = origens.get(evento.origem, 0) + 1
+
+        return {
+            "total": len(self.eventos),
+            "tipos": tipos,
+            "origens": origens,
+            "mais_recente": self.eventos[-1].timestamp
         }
-        self.eventos.append(evento)
-
-        # Simulação de gravação assíncrona para não travar o tick do jogo
-        if len(self.eventos) % 100 == 0:
-            self._escrever_no_disco(evento)
-
-        # Garante que a lista de logs não cresça indefinidamente
-        if len(self.eventos) > self._max_log:
-            self.eventos = self.eventos[-self._max_log:]
-
-    def _escrever_no_disco(self, evento: Dict[str, Any]):
-        """
-        Simulação de escrita em disco. Em um ambiente real, isso usaria
-        um thread separado ou uma fila para não bloquear a execução principal.
-        """
-        # Comentado para não gerar I/O real durante a execução em sandbox.
-        # with open(self.log_path, "a", encoding="utf-8") as f:
-        #     f.write(str(evento) + "\n")
-        pass
-
-    def consultar(self, tipo: Optional[str] = None) -> List[Dict[str, Any]]:
-        """
-        Consulta logs por tipo. Se o tipo não for especificado, retorna todos os logs.
-
-        Args:
-            tipo (Optional[str]): O tipo de log a ser filtrado.
-
-        Returns:
-            List[Dict[str, Any]]: Uma lista de eventos de log.
-        """
-        if tipo is None:
-            return self.eventos
-        return [e for e in self.eventos if e["tipo"] == tipo]
 
 # Instância única global para ser importada por outros módulos
 LOGGER = MotorLogger()

@@ -3,7 +3,7 @@
 Módulo de Combate: Gerencia todos os aspectos das batalhas,
 incluindo cálculos de dano, aplicação de status e resolução de ataques.
 """
-from apolo_engine.entities.entidade_base import EntidadeBase
+from apolo_engine.entities.entidade import Entidade
 from apolo_engine.core.logger import LOGGER
 
 class SistemaDeCombate:
@@ -15,15 +15,15 @@ class SistemaDeCombate:
     def __init__(self):
         LOGGER.registrar("SistemaDeCombate", "inicio", {"mensagem": "Sistema de combate inicializado."})
 
-    def calcular_dano(self, atacante: EntidadeBase, defensor: EntidadeBase, tipo_dano: str = "Físico") -> float:
+    def calcular_dano(self, atacante: Entidade, defensor: Entidade, tipo_dano: str = "Físico") -> float:
         """
         Calcula o dano final de um ataque com base nos atributos do atacante e do defensor.
 
         A fórmula considera o ataque do atacante, seu nível e a defesa do defensor.
 
         Args:
-            atacante (EntidadeBase): A entidade que está realizando o ataque.
-            defensor (EntidadeBase): A entidade que está se defendendo.
+            atacante (Entidade): A entidade que está realizando o ataque.
+            defensor (Entidade): A entidade que está se defendendo.
             tipo_dano (str): O tipo de dano (ex: "Físico", "Nexus"). Não utilizado na fórmula base,
                              mas disponível para expansões com resistências/vulnerabilidades.
 
@@ -40,13 +40,13 @@ class SistemaDeCombate:
 
         return dano_final
 
-    def executar_ataque(self, atacante: EntidadeBase, defensor: EntidadeBase, tipo_dano: str = "Físico"):
+    def executar_ataque(self, atacante: Entidade, defensor: Entidade, tipo_dano: str = "Físico"):
         """
         Executa uma ação de ataque completa de uma entidade para outra.
 
         Args:
-            atacante (EntidadeBase): A entidade que ataca.
-            defensor (EntidadeBase): A entidade que defende.
+            atacante (Entidade): A entidade que ataca.
+            defensor (Entidade): A entidade que defende.
             tipo_dano (str): O tipo de dano do ataque.
         """
         custo_energia_ataque = 25.0
