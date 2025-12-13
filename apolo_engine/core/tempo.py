@@ -14,21 +14,11 @@ class MotorDeTempo:
     """
     _instancia = None
 
-    def __new__(cls):
-        if cls._instancia is None:
-            cls._instancia = super(MotorDeTempo, cls).__new__(cls)
-            cls._instancia._inicializado = False
-        return cls._instancia
-
     def __init__(self, velocidade: float = 1.0):
-        if self._inicializado:
-            return
-
         self.velocidade = velocidade
         self.tempo_de_jogo = datetime(3000, 1, 1, 6, 0, 0) # Começa às 6h da manhã
         self.ultimo_tick_real = datetime.utcnow()
         self.dias_passados = 0
-        self._inicializado = True
 
     def tick(self):
         """

@@ -13,20 +13,20 @@ class GuardianCodeAnalyzer:
     """
     Realiza uma análise estática abrangente no código-fonte do motor.
     """
-    def __init__(self, project_root: str = "apolo_engine"):
-        self.project_root = project_root
+    def __init__(self, directorios_alvo: List[str] = None):
+        self.directorios_alvo = directorios_alvo or ["apolo_engine", "tests"]
         self.riscos: List[str] = []
         self.mapa_arquivos: Dict[str, Dict[str, Any]] = {}
 
     def analisar_projeto(self) -> bool:
         """
-        Executa todas as fases da análise no projeto.
+        Executa todas as fases da análise nos diretórios alvo.
         """
-        print(f"--- GUARDIAN: INICIANDO ANÁLISE DO PROJETO EM '{self.project_root}' ---")
+        print(f"--- GUARDIAN: INICIANDO ANÁLISE EM '{', '.join(self.directorios_alvo)}' ---")
 
         arquivos_py = self._encontrar_arquivos_py()
         if not arquivos_py:
-            self.riscos.append("FALHA CRÍTICA: Nenhum arquivo Python encontrado.")
+            self.riscos.append("FALHA CRÍTICA: Nenhum arquivo Python encontrado nos diretórios alvo.")
             return False
 
         print(f"Encontrados {len(arquivos_py)} arquivos para análise...")
@@ -46,12 +46,13 @@ class GuardianCodeAnalyzer:
         return not self.riscos
 
     def _encontrar_arquivos_py(self) -> List[str]:
-        """Lista todos os arquivos .py no diretório do projeto."""
+        """Lista todos os arquivos .py nos diretórios alvo."""
         arquivos = []
-        for root, _, files in os.walk(self.project_root):
-            for file in files:
-                if file.endswith(".py"):
-                    arquivos.append(os.path.join(root, file))
+        for diretorio in self.directorios_alvo:
+            for root, _, files in os.walk(diretorio):
+                for file in files:
+                    if file.endswith(".py"):
+                        arquivos.append(os.path.join(root, file))
         return arquivos
 
     def _analisar_arquivo(self, path: str):
@@ -133,6 +134,6 @@ class GuardianCodeAnalyzer:
         print("------------------------------------")
 
 if __name__ == "__main__":
-    # Analisa o diretório do projeto e o diretório raiz para uma varredura completa.
-    analisador = GuardianCodeAnalyzer(project_root=".")
+    # Analisa os diretórios alvo padrão ("apolo_engine", "tests").
+    analisador = GuardianCodeAnalyzer()
     analisador.analisar_projeto()

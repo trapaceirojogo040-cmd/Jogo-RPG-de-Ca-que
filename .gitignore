@@ -4,3 +4,4 @@ __pycache__/
 # Ignorar arquivos de ambiente virtual
 venv/
 *.env
+codigo_arquivado/

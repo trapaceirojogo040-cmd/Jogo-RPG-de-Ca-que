@@ -14,19 +14,10 @@ class MotorLogger:
     """
     _instancia = None
 
-    def __new__(cls):
-        if cls._instancia is None:
-            cls._instancia = super(MotorLogger, cls).__new__(cls)
-            cls._instancia._inicializado = False
-        return cls._instancia
-
     def __init__(self):
-        if self._inicializado:
-            return
         self.eventos: List[Dict[str, Any]] = []
         self._max_log = 5000  # Limite de logs para performance
         self.log_path = "apolo_engine.log"
-        self._inicializado = True
 
     def registrar(self, origem: str, tipo: str, dados: Dict[str, Any]):
         """

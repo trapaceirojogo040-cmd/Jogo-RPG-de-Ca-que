@@ -12,16 +12,7 @@ class SistemaDeCombate:
     """
     _instancia = None
 
-    def __new__(cls):
-        if cls._instancia is None:
-            cls._instancia = super(SistemaDeCombate, cls).__new__(cls)
-            cls._instancia._inicializado = False
-        return cls._instancia
-
     def __init__(self):
-        if self._inicializado:
-            return
-        self._inicializado = True
         LOGGER.registrar("SistemaDeCombate", "inicio", {"mensagem": "Sistema de combate inicializado."})
 
     def calcular_dano(self, atacante: EntidadeBase, defensor: EntidadeBase, tipo_dano: str = "Físico") -> float:

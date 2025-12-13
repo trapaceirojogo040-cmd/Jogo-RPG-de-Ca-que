@@ -35,17 +35,8 @@ class SistemaDeFisica:
     """
     _instancia = None
 
-    def __new__(cls):
-        if cls._instancia is None:
-            cls._instancia = super(SistemaDeFisica, cls).__new__(cls)
-            cls._instancia._inicializado = False
-        return cls._instancia
-
     def __init__(self):
-        if self._inicializado:
-            return
         self.corpos: Dict[str, CorpoFisico] = {}
-        self._inicializado = True
         BARRAMENTO_DE_EVENTOS.assinar("TEMPO_AVANCOU", self._on_tick)
 
     def registrar_entidade(self, entidade: EntidadeBase, raio_colisao: float = 1.0):

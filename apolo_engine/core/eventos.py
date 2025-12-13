@@ -47,18 +47,9 @@ class GerenciadorDeEventos:
     """
     _instancia = None
 
-    def __new__(cls):
-        if cls._instancia is None:
-            cls._instancia = super(GerenciadorDeEventos, cls).__new__(cls)
-            cls._instancia._inicializado = False
-        return cls._instancia
-
     def __init__(self):
-        if self._inicializado:
-            return
         self.fila: List[Evento] = []
         self.assinantes: Dict[str, List[Callable]] = {}  # "nome_evento" -> [callback1, callback2]
-        self._inicializado = True
         LOGGER.registrar("GerenciadorDeEventos", "inicio", {"mensagem": "Sistema de eventos inicializado."})
 
     def disparar(self, evento: Evento):

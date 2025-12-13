@@ -44,20 +44,11 @@ class SistemaDeTalentos:
     """
     _instancia = None
 
-    def __new__(cls):
-        if cls._instancia is None:
-            cls._instancia = super(SistemaDeTalentos, cls).__new__(cls)
-            cls._instancia._inicializado = False
-        return cls._instancia
-
     def __init__(self):
-        if self._inicializado:
-            return
         # "classe_personagem" -> {"nome_talento": Talento}
         self.arvores_de_talentos: Dict[str, Dict[str, Talento]] = {}
         # "entidade_id" -> ArvoreDeTalentosComponente
         self.componentes: Dict[str, ArvoreDeTalentosComponente] = {}
-        self._inicializado = True
 
     def registrar_arvore_para_classe(self, nome_classe: str, talentos: List[Talento]):
         """

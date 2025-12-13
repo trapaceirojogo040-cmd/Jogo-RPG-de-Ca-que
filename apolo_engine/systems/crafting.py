@@ -30,17 +30,8 @@ class SistemaDeCrafting:
     """
     _instancia = None
 
-    def __new__(cls):
-        if cls._instancia is None:
-            cls._instancia = super(SistemaDeCrafting, cls).__new__(cls)
-            cls._instancia._inicializado = False
-        return cls._instancia
-
     def __init__(self):
-        if self._inicializado:
-            return
         self.receitas: Dict[str, Receita] = {}
-        self._inicializado = True
         LOGGER.registrar("SistemaDeCrafting", "inicio", {"mensagem": "Sistema de crafting inicializado."})
 
     def registrar_receita(self, nome_receita: str, receita: Receita):
