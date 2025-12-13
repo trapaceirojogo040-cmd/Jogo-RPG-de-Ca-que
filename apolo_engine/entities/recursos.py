@@ -3,7 +3,7 @@
 Módulo de Recursos: Define recursos consumíveis pelas entidades,
 como Energia, Mana, Vigor, etc.
 """
-from apolo_engine.core.eventos import EVENT_BUS, Evento
+from apolo_engine.core.eventos import BARRAMENTO_DE_EVENTOS, Evento
 
 class Energia:
     """
@@ -23,7 +23,7 @@ class Energia:
         self.tipo = tipo
 
         # Se inscreve no evento de tempo para regenerar automaticamente
-        EVENT_BUS.assinar("TEMPO_AVANCOU", self._on_tick)
+        BARRAMENTO_DE_EVENTOS.assinar("TEMPO_AVANCOU", self._on_tick)
 
     def _on_tick(self, evento: Evento):
         """

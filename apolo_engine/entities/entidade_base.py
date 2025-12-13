@@ -6,7 +6,7 @@ os objetos interativos do jogo (personagens, NPCs, monstros, etc.).
 import uuid
 from typing import List
 
-from apolo_engine.core.eventos import EVENT_BUS, Evento
+from apolo_engine.core.eventos import BARRAMENTO_DE_EVENTOS, Evento
 from apolo_engine.core.logger import LOGGER
 from apolo_engine.entities.recursos import Energia
 
@@ -55,7 +55,7 @@ class EntidadeBase:
         dano_recebido = max(0, valor)  # Garante que o dano não seja negativo
         self.hp_atual = max(0, self.hp_atual - dano_recebido)
 
-        EVENT_BUS.disparar(
+        BARRAMENTO_DE_EVENTOS.disparar(
             Evento(
                 nome="DANO_RECEBIDO",
                 origem=origem,
@@ -82,7 +82,7 @@ class EntidadeBase:
         """
         Processa a morte da entidade, disparando um evento crítico.
         """
-        EVENT_BUS.disparar(
+        BARRAMENTO_DE_EVENTOS.disparar(
             Evento(
                 nome="ENTIDADE_DESTRUIDA",
                 origem="SistemaDeEntidades",

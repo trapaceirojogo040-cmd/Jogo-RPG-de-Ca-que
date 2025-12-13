@@ -5,7 +5,7 @@ das entidades no mundo do jogo.
 """
 from typing import Dict
 
-from apolo_engine.core.eventos import EVENT_BUS, Evento
+from apolo_engine.core.eventos import BARRAMENTO_DE_EVENTOS, Evento
 from apolo_engine.utils.vector2d import Vector2D
 from apolo_engine.entities.entidade_base import EntidadeBase
 
@@ -46,7 +46,7 @@ class SistemaDeFisica:
             return
         self.corpos: Dict[str, CorpoFisico] = {}
         self._inicializado = True
-        EVENT_BUS.assinar("TEMPO_AVANCOU", self._on_tick)
+        BARRAMENTO_DE_EVENTOS.assinar("TEMPO_AVANCOU", self._on_tick)
 
     def registrar_entidade(self, entidade: EntidadeBase, raio_colisao: float = 1.0):
         """
@@ -88,7 +88,7 @@ class SistemaDeFisica:
 
                 distancia_vec = corpo_a.posicao - corpo_b.posicao
                 if distancia_vec.magnitude < (corpo_a.raio_colisao + corpo_b.raio_colisao):
-                    EVENT_BUS.disparar(
+                    BARRAMENTO_DE_EVENTOS.disparar(
                         Evento(
                             nome="COLISAO_DETECTADA",
                             origem="SistemaDeFisica",

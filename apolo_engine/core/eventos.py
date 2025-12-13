@@ -114,4 +114,4 @@ class GerenciadorDeEventos:
                         )
 
 # Instância única global
-EVENT_BUS = GerenciadorDeEventos()
+BARRAMENTO_DE_EVENTOS = GerenciadorDeEventos()

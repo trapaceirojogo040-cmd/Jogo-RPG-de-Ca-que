@@ -6,7 +6,7 @@ o ciclo de vida do jogo.
 from typing import Dict
 
 from apolo_engine.core.logger import LOGGER
-from apolo_engine.core.eventos import EVENT_BUS
+from apolo_engine.core.eventos import BARRAMENTO_DE_EVENTOS
 from apolo_engine.core.tempo import TEMPO
 from apolo_engine.systems.fisica import FISICA
 from apolo_engine.systems.combate import COMBATE
@@ -25,7 +25,7 @@ class ApoloEngine:
 
         # Armazena referências aos sistemas singleton para facilitar o acesso
         self.tempo = TEMPO
-        self.eventos = EVENT_BUS
+        self.eventos = BARRAMENTO_DE_EVENTOS
         self.fisica = FISICA
         self.combate = COMBATE
         self.crafting = CRAFTING

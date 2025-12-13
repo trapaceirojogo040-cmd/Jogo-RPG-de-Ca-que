@@ -5,7 +5,7 @@ disparando eventos cíclicos que sincronizam os sistemas.
 """
 from datetime import datetime, timedelta
 
-from apolo_engine.core.eventos import EVENT_BUS, Evento
+from apolo_engine.core.eventos import BARRAMENTO_DE_EVENTOS, Evento
 
 class MotorDeTempo:
     """
@@ -45,7 +45,7 @@ class MotorDeTempo:
         self.tempo_de_jogo += timedelta(seconds=avanco_jogo)
 
         # Dispara o evento principal de passagem de tempo
-        EVENT_BUS.disparar(
+        BARRAMENTO_DE_EVENTOS.disparar(
             Evento(
                 nome="TEMPO_AVANCOU",
                 origem="MotorDeTempo",
@@ -57,7 +57,7 @@ class MotorDeTempo:
         # Verifica se um novo dia começou
         if self.tempo_de_jogo.day != tempo_anterior.day:
             self.dias_passados += 1
-            EVENT_BUS.disparar(
+            BARRAMENTO_DE_EVENTOS.disparar(
                 Evento(
                     nome="NOVO_DIA",
                     origem="MotorDeTempo",
