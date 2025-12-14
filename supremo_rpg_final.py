@@ -356,8 +356,8 @@ class AI_NPC:
                 "Rank de XP": personagem.rank}
 
 # 7. --- TESTE E EXECUÇÃO SIMULADA ---
-if __name__ == "__main__":
-
+def rodar_simulacao_demo():
+    """Roda a simulação de demonstração pré-definida."""
     print("==== SUPREMO RPG AI: INÍCIO DA EXECUÇÃO (DEMO CONCEITUAL) ====")
 
     # 1. SETUP INICIAL
@@ -407,3 +407,111 @@ if __name__ == "__main__":
     print(f"AI decide para {vilao_inimigo.nome} (HP 15): {decisao.upper()}")
 
     print("\n==== EXECUÇÃO SIMULADA FINALIZADA ====")
+
+def iniciar_jogo_interativo():
+    """Inicia o loop principal do jogo interativo."""
+    print("==== SUPREMO RPG AI: MODO INTERATIVO ====")
+    print("Bem-vindo, Comandante! Digite 'ajuda' para ver os comandos.")
+
+    # 1. SETUP INICIAL PARA O MODO INTERATIVO
+    owner = Personagem("Comandante", cargo="OWNER")
+    tec = Tecnologia()
+    eco = Economia(tec)
+    protocolo = ComandoProtocolo()
+    base = BaseMilitar("Sua Base", owner, eco, tec)
+    ai = AI_NPC()
+
+    while True:
+        try:
+            comando_completo = input(f"\u001B[96m> \u001B[0m").strip().lower()
+            if not comando_completo:
+                continue
+
+            partes = comando_completo.split()
+            comando = partes[0]
+            args = partes[1:]
+
+            if comando == "sair":
+                print("Encerrando o jogo. Até a próxima, Comandante!")
+                break
+            elif comando == "ajuda":
+                print("\n--- COMANDOS DISPONÍVEIS ---")
+                print(" - ajuda: Mostra esta lista de comandos.")
+                print(" - status: Exibe o status do seu personagem e da base.")
+                print(" - explorar: Realiza uma exploração para ganhar ouro e XP.")
+                print(" - loja: Mostra os preços atuais do mercado de recursos.")
+                print(" - comprar <recurso> <quantidade>: Compra um recurso (Ex: comprar éter 10).")
+                print(" - pesquisar <tecnologia>: Pesquisa uma nova tecnologia (Ex: pesquisar nanobots de reparo).")
+                print(" - operacao <acao>: Inicia uma operação militar (Ex: operacao ataque_total).")
+                print(" - sair: Encerra o jogo.")
+                print("--------------------------")
+            elif comando == "status":
+                print("\n--- STATUS DO PERSONAGEM ---")
+                for chave, valor in owner.ficha().items():
+                    print(f" - {chave}: {valor}")
+                print("\n--- STATUS DA BASE MILITAR ---")
+                for chave, valor in base.status().items():
+                    print(f" - {chave}: {valor}")
+                print("-----------------------------")
+            elif comando == "explorar":
+                print(owner.agir("explorar"))
+                print(owner.subir_nivel())
+            elif comando == "loja":
+                eco.atualizar_flutuacao()
+                print("\n--- MERCADO DE RECURSOS ---")
+                for recurso, preco_base in eco.mercado.items():
+                    preco_final = int((preco_base / 10) * eco.flutuacao)
+                    print(f" - {recurso}: {preco_final} Ouro/unidade (Estoque: {eco.mercado[recurso]})")
+                print("---------------------------")
+            elif comando == "comprar":
+                if len(args) == 2:
+                    recurso = args[0].capitalize()
+                    try:
+                        quantidade = int(args[1])
+                        if recurso in eco.mercado:
+                            print(eco.transacao(recurso, quantidade, owner))
+                        else:
+                            print(f"\u001B[91mRecurso '{recurso}' não encontrado na loja.\u001B[0m")
+                    except ValueError:
+                        print("\u001B[91mQuantidade inválida. Deve ser um número inteiro.\u001B[0m")
+                else:
+                    print("\u001B[91mUso incorreto. Ex: comprar éter 10\u001B[0m")
+            elif comando == "pesquisar":
+                if len(args) == 1:
+                    tecnologia_nome = " ".join(args).title()
+                    if tecnologia_nome in TECNOLOGIAS:
+                        custo_eter = 150 * tec.nivel  # Custo aumenta com o nível
+                        print(tec.pesquisar(tecnologia_nome, custo_eter, owner, base))
+                    else:
+                        print(f"\u001B[91mTecnologia '{tecnologia_nome}' desconhecida.\u001B[0m")
+                        print(f"Tecnologias disponíveis: {', '.join(TECNOLOGIAS)}")
+                else:
+                    print("\u001B[91mUso incorreto. Ex: pesquisar IA Defensiva\u001B[0m")
+            elif comando == "operacao":
+                if len(args) == 1:
+                    acao_militar = "_".join(args).upper()
+                    if acao_militar in ACOES_MILITARES:
+                        codigo = protocolo.gerar_codigo_confirmacao(acao_militar, tec.nivel, owner.cargo, base.status_comportamento)
+                        print(f"\u001B[93mALERTA: Operação de alto risco '{acao_militar}'.\u001B[0m")
+                        print(f"\u001B[90m[DEBUG] Código de confirmação: {codigo}\u001B[0m")
+                        codigo_inserido = input("Insira o código de confirmação para prosseguir: ").strip().upper()
+                        protocolo.validar_operacao_militar(owner, acao_militar, codigo_inserido, base)
+                    else:
+                        print(f"\u001B[91mAção militar '{acao_militar}' desconhecida.\u001B[0m")
+                        print(f"Ações disponíveis: {', '.join(ACOES_MILITARES.keys())}")
+                else:
+                    print("\u001B[91mUso incorreto. Ex: operacao ataque_total\u001B[0m")
+            else:
+                print(f"\u001B[91mComando '{comando}' não reconhecido. Digite 'ajuda' para ver a lista de comandos.\u001B[0m")
+
+        except KeyboardInterrupt:
+            print("\nEncerrando o jogo. Até a próxima, Comandante!")
+            break
+        except Exception as e:
+            print(f"\u001B[91mOcorreu um erro inesperado: {e}\u001B[0m")
+
+
+if __name__ == "__main__":
+    # Para rodar a simulação original, descomente a linha abaixo
+    # rodar_simulacao_demo()
+    iniciar_jogo_interativo()
