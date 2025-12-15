@@ -2,6 +2,7 @@
 # Arquitetura Unificada de RPG de Estratégia, Hierarquia, Economia e Protocolo AI.
 # O foco é na interdependência dos módulos: Tecnologia afeta Protocolo e Economia.
 
+import bisect
 import random
 import uuid
 import math
@@ -72,12 +73,22 @@ ACOES_MILITARES = {
 SENHA_BASE = "edson4020SS" # Base para geração do código de confirmação
 
 def rank_xp(xp):
-    """Calcula o Rank de poder (F, E, C, B, A, S, Lenda) baseado na XP total."""
-    limites = [100, 500, 2500, 8000, 30000, 70000, 99999999]
-    tags = ['F', 'E', 'C', 'B', 'A', 'S', 'Lenda']
-    for i, v in enumerate(limites):
-        if xp < v: return tags[i]
-    return tags[-1]
+    """
+    Calcula o Rank de poder (F, E, C, B, A, S, Lenda) baseado na XP total.
+    Otimizado com busca binária (O(log n)) para melhor performance.
+    """
+    # ⚡ Bolt Optimization: Trocou a varredura linear (O(n)) por busca binária (O(log n)).
+    # Isto é significativamente mais rápido para determinar o rank, especialmente se a lista de ranks crescer.
+    limites = [100, 500, 2500, 8000, 30000, 70000]  # Limites de XP para cada rank
+    tags = ['F', 'E', 'C', 'B', 'A', 'S', 'Lenda']  # Nomes dos Ranks
+
+    # bisect_right encontra o índice do primeiro elemento estritamente maior que xp.
+    # Isso corresponde diretamente ao índice do rank do jogador.
+    # Ex: xp=99 -> bisect_right -> 0 (Rank F)
+    # Ex: xp=100 -> bisect_right -> 1 (Rank E)
+    # Ex: xp=70000 -> bisect_right -> 6 (Rank Lenda)
+    index = bisect.bisect_right(limites, xp)
+    return tags[index]
 
 class ContaUsuario:
     """Classe simples para simular autenticação do OWNER."""
@@ -322,7 +333,7 @@ class AI_NPC:
         health_ratio_alvo = alvo.hp / hp_max_estimado_alvo
 
         # Pontuação de saúde do NPC (0=morto, 1=saudável). Sigmoid faz a pontuação cair drasticamente abaixo de 50%
-        health_score_npc = self._sigmoid(health_ratio_npc)
+        health_score_npc = AI_NPC._sigmoid(health_ratio_npc)
 
         # Pontuação para ATACAR: útil se o NPC está saudável E o alvo está ferido.
         score_atacar = health_score_npc * 0.6 + (1 - health_ratio_alvo) * 0.4
