@@ -155,6 +155,21 @@ class Personagem:
             "Rank": self.rank, "Nível": self.nivel
         }
 
+    def exibir_ficha(self):
+        """Exibe o resumo do personagem em formato legível."""
+        stats = self.ficha()
+        print(
+            f"\n--- Ficha de Personagem ---\n"
+            f"  Nome:    {stats['Nome']} ({stats['Cargo']})\n"
+            f"  Raça:    {stats['Raça']}\n"
+            f"  Classe:  {stats['Classe']}\n"
+            f"  -------------------------\n"
+            f"  HP:      {stats['HP']}\n"
+            f"  XP:      {stats['XP']} (Rank: {stats['Rank']}, Nível: {stats['Nível']})\n"
+            f"  Ouro:    {stats['Ouro']}\n"
+            f"  -------------------------"
+        )
+
 # 4. --- MÓDULO DE COMANDO E PROTOCOLO (Confirmação Militar) ---
 class ComandoProtocolo:
     """Gerencia a confirmação de operações críticas (Hierarquia e Segurança)."""
@@ -380,7 +395,7 @@ if __name__ == "__main__":
 
     print("\n--- STATUS DE HIERARQUIA E BASE ---")
     print(base.status())
-    print(owner.ficha())
+    owner.exibir_ficha()
 
     # 2. CICLO TECNOLOGIA E COMPORTAMENTO
     print("\n--- CICLO: TECNOLOGIA E COMPORTAMENTO ---")
