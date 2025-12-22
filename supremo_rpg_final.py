@@ -6,6 +6,7 @@ import random
 import uuid
 import math
 import hashlib
+import bisect
 from datetime import datetime, timedelta
 from typing import Dict, List, Any
 
@@ -72,12 +73,16 @@ ACOES_MILITARES = {
 SENHA_BASE = "edson4020SS" # Base para geração do código de confirmação
 
 def rank_xp(xp):
-    """Calcula o Rank de poder (F, E, C, B, A, S, Lenda) baseado na XP total."""
-    limites = [100, 500, 2500, 8000, 30000, 70000, 99999999]
+    """
+    Calcula o Rank de poder (F, E, C, B, A, S, Lenda) baseado na XP total.
+    ⚡ Bolt Optimization: Replaced O(n) linear search with O(log n) binary search.
+    """
+    limites = [100, 500, 2500, 8000, 30000, 70000]
     tags = ['F', 'E', 'C', 'B', 'A', 'S', 'Lenda']
-    for i, v in enumerate(limites):
-        if xp < v: return tags[i]
-    return tags[-1]
+    # bisect_right encontra o ponto de inserção para manter a lista ordenada.
+    # Isso é mais eficiente do que um loop for linear para encontrar o rank.
+    index = bisect.bisect_right(limites, xp)
+    return tags[index]
 
 class ContaUsuario:
     """Classe simples para simular autenticação do OWNER."""
@@ -322,7 +327,7 @@ class AI_NPC:
         health_ratio_alvo = alvo.hp / hp_max_estimado_alvo
 
         # Pontuação de saúde do NPC (0=morto, 1=saudável). Sigmoid faz a pontuação cair drasticamente abaixo de 50%
-        health_score_npc = self._sigmoid(health_ratio_npc)
+        health_score_npc = AI_NPC._sigmoid(health_ratio_npc)
 
         # Pontuação para ATACAR: útil se o NPC está saudável E o alvo está ferido.
         score_atacar = health_score_npc * 0.6 + (1 - health_ratio_alvo) * 0.4
