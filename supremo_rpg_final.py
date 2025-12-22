@@ -355,6 +355,17 @@ class AI_NPC:
                 "Poder Tático (Hierarquia)": personagem.nivel * (1 + CARGOS.index(personagem.cargo)/5),
                 "Rank de XP": personagem.rank}
 
+def exibir_dicionario(dados: Dict[str, Any], titulo: str):
+    """Exibe um dicionário de forma legível e organizada."""
+    print(f"\n--- {titulo.upper()} ---")
+    for chave, valor in dados.items():
+        if isinstance(valor, dict):
+            print(f"  {chave}:")
+            for sub_chave, sub_valor in valor.items():
+                print(f"    - {sub_chave}: {sub_valor}")
+        else:
+            print(f"  {chave}: {valor}")
+
 # 7. --- TESTE E EXECUÇÃO SIMULADA ---
 if __name__ == "__main__":
 
@@ -378,9 +389,8 @@ if __name__ == "__main__":
     agente_inativo = Personagem("Inativo", cargo="Jogador")
     storage.logins[agente_inativo.id] = datetime.now() - timedelta(days=31)
 
-    print("\n--- STATUS DE HIERARQUIA E BASE ---")
-    print(base.status())
-    print(owner.ficha())
+    exibir_dicionario(base.status(), "Status de Hierarquia e Base")
+    exibir_dicionario(owner.ficha(), "Ficha do Comandante")
 
     # 2. CICLO TECNOLOGIA E COMPORTAMENTO
     print("\n--- CICLO: TECNOLOGIA E COMPORTAMENTO ---")
