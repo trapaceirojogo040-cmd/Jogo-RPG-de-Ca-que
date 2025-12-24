@@ -97,6 +97,8 @@ def frase_log(entidade, acao, sucesso=True, cor="\u001B[92m"):
     return f"{cor}[{nome}-{cargo}] {acao} - {status}\u001B[0m"
 
 # 3. --- OBJETOS DO JOGO (RPG CORE) ---
+XP_NECESSARIO_CACHE = {}  # Cache para armazenar o XP necessário para cada nível
+
 class Personagem:
     """Representa uma Unidade, NPC ou Jogador (Base de RPG)."""
     def __init__(self, nome, cargo="Jogador", classe=None, raca=None):
@@ -138,7 +140,16 @@ class Personagem:
 
     def subir_nivel(self):
         """Lógica de progressão Isekai/RPG (a dificuldade aumenta exponencialmente)."""
-        xp_necessario = 400 * (1.5 ** (self.nivel - 1))
+        # ⚡ Bolt: Otimização para evitar recálculo de XP.
+        # O XP necessário para cada nível é constante. Ao armazená-lo em cache
+        # após o primeiro cálculo, evitamos a operação de exponenciação (**)
+        # repetida, que é computacionalmente mais cara.
+        if self.nivel in XP_NECESSARIO_CACHE:
+            xp_necessario = XP_NECESSARIO_CACHE[self.nivel]
+        else:
+            xp_necessario = 400 * (1.5 ** (self.nivel - 1))
+            XP_NECESSARIO_CACHE[self.nivel] = xp_necessario
+
         if self.xp >= xp_necessario:
             self.nivel += 1
             self.hp = int(self.hp * 1.2) # Aumento de 20% de HP por nível
@@ -322,7 +333,7 @@ class AI_NPC:
         health_ratio_alvo = alvo.hp / hp_max_estimado_alvo
 
         # Pontuação de saúde do NPC (0=morto, 1=saudável). Sigmoid faz a pontuação cair drasticamente abaixo de 50%
-        health_score_npc = self._sigmoid(health_ratio_npc)
+        health_score_npc = AI_NPC._sigmoid(health_ratio_npc)
 
         # Pontuação para ATACAR: útil se o NPC está saudável E o alvo está ferido.
         score_atacar = health_score_npc * 0.6 + (1 - health_ratio_alvo) * 0.4
