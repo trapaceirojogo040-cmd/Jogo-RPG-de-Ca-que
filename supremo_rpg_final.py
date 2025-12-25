@@ -96,6 +96,31 @@ def frase_log(entidade, acao, sucesso=True, cor="\u001B[92m"):
     cargo = entidade.cargo if hasattr(entidade, 'cargo') else 'Sistema'
     return f"{cor}[{nome}-{cargo}] {acao} - {status}\u001B[0m"
 
+def imprimir_caixa(dados: Dict[str, Any], titulo: str):
+    """Imprime um dicionário formatado em uma caixa de texto para melhor UX."""
+    # Encontra o comprimento máximo para chaves e valores para alinhar a caixa
+    max_key_len = max(len(k) for k in dados.keys()) if dados else 0
+    # Garante que valores não-string sejam convertidos para cálculo de comprimento
+    max_value_len = max(len(str(v)) for v in dados.values()) if dados else 0
+
+    # Define a largura total da caixa
+    largura_total = max(len(titulo), max_key_len + max_value_len + 3) + 4
+
+    # Imprime a borda superior
+    print(f"╔{'═' * (largura_total - 2)}╗")
+    # Imprime o título centralizado
+    print(f"║ {titulo.center(largura_total - 4)} ║")
+    # Imprime a linha separadora
+    print(f"╠{'═' * (largura_total - 2)}╣")
+
+    # Imprime cada par chave-valor formatado
+    for chave, valor in dados.items():
+        linha = f"{chave.ljust(max_key_len)} : {str(valor).ljust(max_value_len)}"
+        print(f"║ {linha.ljust(largura_total - 4)} ║")
+
+    # Imprime a borda inferior
+    print(f"╚{'═' * (largura_total - 2)}╝")
+
 # 3. --- OBJETOS DO JOGO (RPG CORE) ---
 class Personagem:
     """Representa uma Unidade, NPC ou Jogador (Base de RPG)."""
@@ -379,8 +404,8 @@ if __name__ == "__main__":
     storage.logins[agente_inativo.id] = datetime.now() - timedelta(days=31)
 
     print("\n--- STATUS DE HIERARQUIA E BASE ---")
-    print(base.status())
-    print(owner.ficha())
+    imprimir_caixa(base.status(), "Status da Base")
+    imprimir_caixa(owner.ficha(), "Ficha do Comandante")
 
     # 2. CICLO TECNOLOGIA E COMPORTAMENTO
     print("\n--- CICLO: TECNOLOGIA E COMPORTAMENTO ---")
