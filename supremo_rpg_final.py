@@ -155,6 +155,23 @@ class Personagem:
             "Rank": self.rank, "Nível": self.nivel
         }
 
+    def mostrar_ficha(self):
+        """Exibe a ficha do personagem de forma formatada e agradável."""
+        ficha_info = self.ficha()
+
+        # Cores para a UI
+        cor_titulo = "\u001B[95m"
+        cor_chave = "\u001B[94m"
+        cor_valor = "\u001B[97m"
+        reset_cor = "\u001B[0m"
+
+        print(f"\n{cor_titulo}--- Ficha de Personagem: {ficha_info['Nome']} ---{reset_cor}")
+        print(f"  {cor_chave}Cargo:{reset_cor} {cor_valor}{ficha_info['Cargo']}{reset_cor}")
+        print(f"  {cor_chave}Raça:{reset_cor} {cor_valor}{ficha_info['Raça']}{reset_cor} / {cor_chave}Classe:{reset_cor} {cor_valor}{ficha_info['Classe']}{reset_cor}")
+        print(f"  {cor_chave}HP:{reset_cor} {cor_valor}{ficha_info['HP']}{reset_cor} | {cor_chave}Nível:{reset_cor} {cor_valor}{ficha_info['Nível']}{reset_cor} | {cor_chave}Rank:{reset_cor} {cor_valor}{ficha_info['Rank']}{reset_cor}")
+        print(f"  {cor_chave}XP:{reset_cor} {cor_valor}{ficha_info['XP']}{reset_cor} | {cor_chave}Ouro:{reset_cor} {cor_valor}{ficha_info['Ouro']}{reset_cor}")
+        print(f"{cor_titulo}-------------------------------------------{reset_cor}")
+
 # 4. --- MÓDULO DE COMANDO E PROTOCOLO (Confirmação Militar) ---
 class ComandoProtocolo:
     """Gerencia a confirmação de operações críticas (Hierarquia e Segurança)."""
@@ -380,7 +397,7 @@ if __name__ == "__main__":
 
     print("\n--- STATUS DE HIERARQUIA E BASE ---")
     print(base.status())
-    print(owner.ficha())
+    owner.mostrar_ficha()
 
     # 2. CICLO TECNOLOGIA E COMPORTAMENTO
     print("\n--- CICLO: TECNOLOGIA E COMPORTAMENTO ---")
