@@ -322,7 +322,7 @@ class AI_NPC:
         health_ratio_alvo = alvo.hp / hp_max_estimado_alvo
 
         # Pontuação de saúde do NPC (0=morto, 1=saudável). Sigmoid faz a pontuação cair drasticamente abaixo de 50%
-        health_score_npc = self._sigmoid(health_ratio_npc)
+        health_score_npc = AI_NPC._sigmoid(health_ratio_npc)
 
         # Pontuação para ATACAR: útil se o NPC está saudável E o alvo está ferido.
         score_atacar = health_score_npc * 0.6 + (1 - health_ratio_alvo) * 0.4
@@ -337,7 +337,7 @@ class AI_NPC:
 
     def decidir_acao_npc(self, npc: Personagem, alvo: Personagem) -> str:
         """Decide a ação de maior utilidade com base nos scores."""
-        scores = self._utility_score(npc, alvo)
+        scores = AI_NPC._utility_score(npc, alvo)
 
         # Regras de Ponderação
         if scores["cura"] > 0.6: return "cura" # Prioridade alta para cura se saúde < ~40%
