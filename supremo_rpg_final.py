@@ -155,6 +155,23 @@ class Personagem:
             "Rank": self.rank, "Nível": self.nivel
         }
 
+    def display_ficha(self):
+        """Exibe o resumo do personagem com formatação e cores."""
+        # 🎨 Palette: Adiciona um método de exibição para a ficha do personagem.
+        ficha_data = self.ficha()
+        ficha_str = (
+            f"\n\u001B[95m--- Ficha de Personagem ---\u001B[0m\n"
+            f" \u001B[93mNome:\u001B[0m   {ficha_data['Nome']} ({ficha_data['Cargo']})\n"
+            f" \u001B[93mRaça:\u001B[0m   {ficha_data['Raça']}\n"
+            f" \u001B[93mClasse:\u001B[0m {ficha_data['Classe']}\n"
+            f" \u001B[92mHP:\u001B[0m     {ficha_data['HP']}\n"
+            f" \u001B[94mNível:\u001B[0m  {ficha_data['Nível']} (Rank: {ficha_data['Rank']})\n"
+            f" \u001B[94mXP:\u001B[0m     {ficha_data['XP']}\n"
+            f" \u001B[93mOuro:\u001B[0m   {ficha_data['Ouro']}\n"
+            f"\u001B[95m-------------------------\u001B[0m"
+        )
+        print(ficha_str)
+
 # 4. --- MÓDULO DE COMANDO E PROTOCOLO (Confirmação Militar) ---
 class ComandoProtocolo:
     """Gerencia a confirmação de operações críticas (Hierarquia e Segurança)."""
@@ -301,6 +318,21 @@ class BaseMilitar:
             "Status da Rede": self.rede.status_rede
         }
 
+    def display_status(self):
+        """Exibe o status detalhado da Base com formatação e cores."""
+        # 🎨 Palette: Adiciona um método de exibição para o status da base.
+        status_data = self.status()
+        status_str = (
+            f"\n\u001B[95m--- Status da Base Militar ---\u001B[0m\n"
+            f" \u001B[93mBase:\u001B[0m              {status_data['Base']}\n"
+            f" \u001B[93mComandante:\u001B[0m        {status_data['Comandante']}\n"
+            f" \u001B[92mRecursos:\u001B[0m          {status_data['Recursos']}\n"
+            f" \u001B[94mNível Tecnológico:\u001B[0m    {status_data['Nível Tecnológico']}\n"
+            f" \u001B[94mStatus da Rede:\u001B[0m       {status_data['Status da Rede']}\n"
+            f"\u001B[95m------------------------------\u001B[0m"
+        )
+        print(status_str)
+
 # 6. --- AI ANALYTICS & NPC (Utility AI) ---
 class AI_NPC:
     """IA de suporte e análise, usando Utility Scoring para decisões táticas."""
@@ -379,8 +411,8 @@ if __name__ == "__main__":
     storage.logins[agente_inativo.id] = datetime.now() - timedelta(days=31)
 
     print("\n--- STATUS DE HIERARQUIA E BASE ---")
-    print(base.status())
-    print(owner.ficha())
+    base.display_status()
+    owner.display_ficha()
 
     # 2. CICLO TECNOLOGIA E COMPORTAMENTO
     print("\n--- CICLO: TECNOLOGIA E COMPORTAMENTO ---")
