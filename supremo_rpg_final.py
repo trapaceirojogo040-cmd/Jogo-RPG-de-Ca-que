@@ -155,6 +155,14 @@ class Personagem:
             "Rank": self.rank, "Nível": self.nivel
         }
 
+    def exibir_ficha(self):
+        """Exibe a ficha do personagem de forma formatada e colorida."""
+        print("\n\u001B[95m--- FICHA DE PERSONAGEM ---\u001B[0m")
+        ficha_data = self.ficha()
+        for chave, valor in ficha_data.items():
+            print(f"  \u001B[96m{chave.ljust(10)}:\u001B[0m \u001B[93m{valor}\u001B[0m")
+        print("\u001B[95m---------------------------\u001B[0m")
+
 # 4. --- MÓDULO DE COMANDO E PROTOCOLO (Confirmação Militar) ---
 class ComandoProtocolo:
     """Gerencia a confirmação de operações críticas (Hierarquia e Segurança)."""
@@ -380,7 +388,7 @@ if __name__ == "__main__":
 
     print("\n--- STATUS DE HIERARQUIA E BASE ---")
     print(base.status())
-    print(owner.ficha())
+    owner.exibir_ficha()
 
     # 2. CICLO TECNOLOGIA E COMPORTAMENTO
     print("\n--- CICLO: TECNOLOGIA E COMPORTAMENTO ---")
