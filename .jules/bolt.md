@@ -1,0 +1,3 @@
+## 2024-07-29 - O(n) to O(1) Lookup Optimization
+**Learning:** Identified that frequent `list.index()` lookups on the `CARGOS` global list were an unnecessary O(n) operation. In a high-frequency context like game loops or authorization checks, this could become a measurable bottleneck.
+**Action:** Always convert list-based lookups to dictionary/hash map lookups for critical or frequently accessed data structures. The performance gain from O(n) to O(1) is significant and easy to implement.
