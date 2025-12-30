@@ -10,36 +10,36 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Any
 
 # 1. --- MÓDULO DE SEGURANÇA E PODER PSICOLÓGICO ---
-class PowerProtocol:
+class ProtocoloDePoder:
     """Define a Volição e Sinergia dos personagens."""
     def __init__(self, role: str):
-        self.volicao_level: int = random.randint(50, 100)
+        self.nivel_volicao: int = random.randint(50, 100)
         self.sinergia_moral: float = 1.0
-        self.abilities = self._set_abilities(role)
+        self.habilidades = self._definir_habilidades(role)
 
-    def _set_abilities(self, role: str) -> Dict[str, str]:
+    def _definir_habilidades(self, role: str) -> Dict[str, str]:
         if "OWNER" in role or "Comandante" in role:
-            self.volicao_level = 999
+            self.nivel_volicao = 999
             self.sinergia_moral = 1.5
             return {
-                "Poder Psicológico": "Volição (Controle de Causalidade OP)",
-                "Força Bélica": "Arsenal de Éter e Defesa Quântica",
+                "Poder Psicologico": "Volição (Controle de Causalidade OP)",
+                "Forca Belica": "Arsenal de Eter e Defesa Quantica",
             }
-        return {"Poder Psicológico": "Padrão", "Força Bélica": "Básico"}
+        return {"Poder Psicologico": "Padrao", "Forca Belica": "Basico"}
 
-class StorageService:
+class ServicoDeArmazenamento:
     """Gerencia o armazenamento seguro e o protocolo de destruição de dados."""
     def __init__(self):
         self.logins: Dict[str, datetime] = {}
 
-    def execute_entropy_protocol(self, max_days_inactive: int = 30):
+    def executar_protocolo_entropia(self, max_dias_inativo: int = 30):
         """Executa a Lei da Destruição de Dados (Entropia)."""
-        cutoff_date = datetime.now() - timedelta(days=max_days_inactive)
-        keys_to_destroy = [
-            user_id for user_id, last_login in self.logins.items()
-            if last_login < cutoff_date
+        data_corte = datetime.now() - timedelta(days=max_dias_inativo)
+        chaves_para_destruir = [
+            user_id for user_id, ultimo_login in self.logins.items()
+            if ultimo_login < data_corte
         ]
-        for user_id in keys_to_destroy:
+        for user_id in chaves_para_destruir:
             del self.logins[user_id]
             print(f" [PROTOCOLO ENTROPIA]: Dados de {user_id[:8]} destruídos por inatividade.")
 
@@ -86,7 +86,7 @@ class ContaUsuario:
         self.senha = senha
         self.cargo = cargo
 
-OWNER = ContaUsuario("caiquesanto674@gmail.com", SENHA_BASE, "OWNER")
+PROPRIETARIO = ContaUsuario("caiquesanto674@gmail.com", SENHA_BASE, "OWNER")
 
 # 2. --- FEEDBACK EM COR (LOGS) ---
 def frase_log(entidade, acao, sucesso=True, cor="\u001B[92m"):
@@ -105,9 +105,9 @@ class Personagem:
         self.cargo = cargo
         self.raca = raca or random.choice(RACAS)
         self.classe = classe or random.choice(CLASSES)
-        self.powers = PowerProtocol(cargo)
+        self.poderes = ProtocoloDePoder(cargo)
         # Bônus para OWNER (Hierarquia e Poder)
-        self.hp = 1200 if cargo == "OWNER" else 100
+        self.pv = 1200 if cargo == "OWNER" else 100
         self.mana = 900 if cargo == "OWNER" else 50
         self.xp = 0
         self.nivel = 1
@@ -121,14 +121,14 @@ class Personagem:
         """Simula ações básicas de combate e exploração."""
         if acao == "atacar" and alvo:
             dano = random.randint(15, 40)
-            alvo.hp = max(0, alvo.hp - dano)
+            alvo.pv = max(0, alvo.pv - dano)
             self.xp += 35
-            msg = f"atacou {alvo.nome} tirou {dano} HP."
+            msg = f"atacou {alvo.nome} tirou {dano} PV."
             return frase_log(self, msg, True)
         elif acao == "cura":
-            self.hp = min(self.hp + 30, 120 + 10 * self.nivel) # Cura limitada ao HP máximo
+            self.pv = min(self.pv + 30, 120 + 10 * self.nivel) # Cura limitada ao PV máximo
             self.mana = max(0, self.mana - 10)
-            return frase_log(self, "se curou 30 HP.")
+            return frase_log(self, "se curou 30 PV.")
         elif acao == "explorar":
             ganho = random.randint(10,80)
             self.ouro += ganho
@@ -141,7 +141,7 @@ class Personagem:
         xp_necessario = 400 * (1.5 ** (self.nivel - 1))
         if self.xp >= xp_necessario:
             self.nivel += 1
-            self.hp = int(self.hp * 1.2) # Aumento de 20% de HP por nível
+            self.pv = int(self.pv * 1.2) # Aumento de 20% de PV por nível
             self.rank = rank_xp(self.xp)
             self.historico.append(f"Subiu para nível {self.nivel} (Rank {self.rank})")
             return frase_log(self, "subiu de nível! Poder Tático Aumentado!")
@@ -151,7 +151,7 @@ class Personagem:
         """Retorna o resumo do personagem."""
         return {
             "Nome": self.nome, "Cargo": self.cargo, "Raça": self.raca, "Classe": self.classe,
-            "HP": self.hp, "XP": self.xp, "Ouro": self.ouro,
+            "PV": self.pv, "XP": self.xp, "Ouro": self.ouro,
             "Rank": self.rank, "Nível": self.nivel
         }
 
@@ -248,8 +248,8 @@ class Tecnologia:
             base_militar.rede.atualizar_rede(self.nivel) # Atualiza a rede
 
             if tech == 'IA Defensiva Quântica':
-                player.hp += 500 # Aumento de poder tático do comandante
-                print(frase_log(player, f"Tecnologia {tech} desbloqueada! Comandante HP +500", True, "\u001B[93m"))
+                player.pv += 500 # Aumento de poder tático do comandante
+                print(frase_log(player, f"Tecnologia {tech} desbloqueada! Comandante PV +500", True, "\u001B[93m"))
             return frase_log(player, f"Tecnologia {tech} desbloqueada (Nível {self.nivel})!", True, "\u001B[93m")
         return frase_log(player, f"Éter insuficiente (custo: {custo_eter})", False, "\u001B[91m")
 
@@ -301,10 +301,10 @@ class BaseMilitar:
             "Status da Rede": self.rede.status_rede
         }
 
-# 6. --- AI ANALYTICS & NPC (Utility AI) ---
-class AI_NPC:
-    """IA de suporte e análise, usando Utility Scoring para decisões táticas."""
-    def __init__(self, nome='AI Suprema'):
+# 6. --- ANÁLISE E IA DE NPC (Utility AI) ---
+class IA_NPC:
+    """IA de suporte e análise, usando Pontuação de Utilidade para decisões táticas."""
+    def __init__(self, nome='IA Suprema'):
         self.nome = nome
 
     @staticmethod
@@ -313,39 +313,39 @@ class AI_NPC:
         return 1 / (1 + math.exp(-k * (x - x0)))
 
     @staticmethod
-    def _utility_score(personagem: Personagem, alvo: Personagem) -> Dict[str, float]:
+    def _pontuacao_utilidade(personagem: Personagem, alvo: Personagem) -> Dict[str, float]:
         """Calcula a utilidade de cada ação para o NPC usando uma curva sigmoid para a saúde."""
-        hp_max_estimado_npc = 100 + 10 * personagem.nivel
-        health_ratio_npc = personagem.hp / hp_max_estimado_npc
+        pv_max_estimado_npc = 100 + 10 * personagem.nivel
+        taxa_saude_npc = personagem.pv / pv_max_estimado_npc
 
-        hp_max_estimado_alvo = 100 + 10 * alvo.nivel
-        health_ratio_alvo = alvo.hp / hp_max_estimado_alvo
+        pv_max_estimado_alvo = 100 + 10 * alvo.nivel
+        taxa_saude_alvo = alvo.pv / pv_max_estimado_alvo
 
         # Pontuação de saúde do NPC (0=morto, 1=saudável). Sigmoid faz a pontuação cair drasticamente abaixo de 50%
-        health_score_npc = self._sigmoid(health_ratio_npc)
+        pontuacao_saude_npc = IA_NPC._sigmoid(taxa_saude_npc)
 
         # Pontuação para ATACAR: útil se o NPC está saudável E o alvo está ferido.
-        score_atacar = health_score_npc * 0.6 + (1 - health_ratio_alvo) * 0.4
+        pontuacao_atacar = pontuacao_saude_npc * 0.6 + (1 - taxa_saude_alvo) * 0.4
 
         # Pontuação para CURAR: útil se o NPC está ferido (inverso da pontuação de saúde).
-        score_curar = 1 - health_score_npc
+        pontuacao_curar = 1 - pontuacao_saude_npc
 
         # Pontuação para EXPLORAR: útil se o NPC está com saúde razoável e não houver ameaça imediata.
-        score_explorar = health_score_npc * 0.5
+        pontuacao_explorar = pontuacao_saude_npc * 0.5
 
-        return {"atacar": score_atacar, "cura": score_curar, "explorar": score_explorar}
+        return {"atacar": pontuacao_atacar, "cura": pontuacao_curar, "explorar": pontuacao_explorar}
 
-    def decidir_acao_npc(self, npc: Personagem, alvo: Personagem) -> str:
-        """Decide a ação de maior utilidade com base nos scores."""
-        scores = self._utility_score(npc, alvo)
+    def decidir_acao(self, npc: Personagem, alvo: Personagem) -> str:
+        """Decide a ação de maior utilidade com base nas pontuações."""
+        pontuacoes = self._pontuacao_utilidade(npc, alvo)
 
         # Regras de Ponderação
-        if scores["cura"] > 0.6: return "cura" # Prioridade alta para cura se saúde < ~40%
-        if scores["atacar"] > 0.7: return "atacar" # Ataca se a vantagem for clara
+        if pontuacoes["cura"] > 0.6: return "cura" # Prioridade alta para cura se saúde < ~40%
+        if pontuacoes["atacar"] > 0.7: return "atacar" # Ataca se a vantagem for clara
 
         # Escolhe a melhor ação restante ou explora por padrão
-        del scores["cura"] # Já foi avaliada
-        return max(scores, key=scores.get) if scores else "explorar"
+        del pontuacoes["cura"] # Já foi avaliada
+        return max(pontuacoes, key=pontuacoes.get) if pontuacoes else "explorar"
 
     def analisar(self, personagem: Personagem) -> Dict[str, Any]:
         """Gera uma análise completa do perfil do personagem (Análise e Teste)."""
@@ -361,30 +361,30 @@ if __name__ == "__main__":
     print("==== SUPREMO RPG AI: INÍCIO DA EXECUÇÃO (DEMO CONCEITUAL) ====")
 
     # 1. SETUP INICIAL
-    owner = Personagem("Caíque", cargo="OWNER")
+    proprietario = Personagem("Caíque", cargo="OWNER")
     tec = Tecnologia()
     eco = Economia(tec)
     protocolo = ComandoProtocolo()
-    storage = StorageService()
-    base = BaseMilitar("Bastião da Verdade", owner, eco, tec)
-    ai = AI_NPC()
+    armazenamento = ServicoDeArmazenamento()
+    base = BaseMilitar("Bastião da Verdade", proprietario, eco, tec)
+    ia = IA_NPC()
 
     npc_diretor = Personagem("Maria", cargo="Diretor", classe="Comandante", raca="Androide")
     vilao_inimigo = Personagem("Ezren", classe="Assassino", raca="Demônio")
 
     # Simula logins para o protocolo de entropia
-    storage.logins[owner.id] = datetime.now()
-    storage.logins[npc_diretor.id] = datetime.now()
+    armazenamento.logins[proprietario.id] = datetime.now()
+    armazenamento.logins[npc_diretor.id] = datetime.now()
     agente_inativo = Personagem("Inativo", cargo="Jogador")
-    storage.logins[agente_inativo.id] = datetime.now() - timedelta(days=31)
+    armazenamento.logins[agente_inativo.id] = datetime.now() - timedelta(days=31)
 
     print("\n--- STATUS DE HIERARQUIA E BASE ---")
     print(base.status())
-    print(owner.ficha())
+    print(proprietario.ficha())
 
     # 2. CICLO TECNOLOGIA E COMPORTAMENTO
     print("\n--- CICLO: TECNOLOGIA E COMPORTAMENTO ---")
-    tec.pesquisar("Nanobots de Reparo", 100, owner, base)
+    tec.pesquisar("Nanobots de Reparo", 100, proprietario, base)
     base.alterar_comportamento("AGRESSIVO")
 
     # 3. CICLO PROTOCOLO MILITAR
@@ -396,14 +396,14 @@ if __name__ == "__main__":
 
     # 4. CICLO DE SEGURANÇA (ENTROPIA)
     print("\n--- CICLO: SEGURANÇA E ENTROPIA ---")
-    storage.execute_entropy_protocol()
+    armazenamento.executar_protocolo_entropia()
 
     # 5. TESTE DE DECISÃO DA AI
-    print("\n--- ANÁLISE E DECISÃO DA AI (UTILITY SCORING) ---")
-    print(ai.analisar(vilao_inimigo))
+    print("\n--- ANÁLISE E DECISÃO DA AI (PONTUAÇÃO DE UTILIDADE) ---")
+    print(ia.analisar(vilao_inimigo))
 
-    vilao_inimigo.hp = 15 # Deixa o vilão fraco para a AI decidir
-    decisao = ai.decidir_acao_npc(vilao_inimigo, owner) # AI decide a ação do vilão
-    print(f"AI decide para {vilao_inimigo.nome} (HP 15): {decisao.upper()}")
+    vilao_inimigo.pv = 15 # Deixa o vilão fraco para a AI decidir
+    decisao = ia.decidir_acao(vilao_inimigo, proprietario) # AI decide a ação do vilão
+    print(f"IA decide para {vilao_inimigo.nome} (PV 15): {decisao.upper()}")
 
     print("\n==== EXECUÇÃO SIMULADA FINALIZADA ====")
