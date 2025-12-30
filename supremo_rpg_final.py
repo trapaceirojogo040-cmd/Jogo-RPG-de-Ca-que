@@ -96,6 +96,13 @@ def frase_log(entidade, acao, sucesso=True, cor="\u001B[92m"):
     cargo = entidade.cargo if hasattr(entidade, 'cargo') else 'Sistema'
     return f"{cor}[{nome}-{cargo}] {acao} - {status}\u001B[0m"
 
+def imprimir_dicionario_formatado(titulo: str, dados: Dict[str, Any]):
+    """Imprime um dicionário com formatação e cores para melhor legibilidade."""
+    print(f"\n\u001B[95m--- {titulo.upper()} ---")
+    for chave, valor in dados.items():
+        print(f"  \u001B[96m{chave}:\u001B[0m {valor}")
+    print("\u001B[95m" + "-" * (len(titulo) + 6) + "\u001B[0m")
+
 # 3. --- OBJETOS DO JOGO (RPG CORE) ---
 class Personagem:
     """Representa uma Unidade, NPC ou Jogador (Base de RPG)."""
@@ -378,9 +385,8 @@ if __name__ == "__main__":
     agente_inativo = Personagem("Inativo", cargo="Jogador")
     storage.logins[agente_inativo.id] = datetime.now() - timedelta(days=31)
 
-    print("\n--- STATUS DE HIERARQUIA E BASE ---")
-    print(base.status())
-    print(owner.ficha())
+    imprimir_dicionario_formatado("Status da Base", base.status())
+    imprimir_dicionario_formatado("Ficha do Comandante", owner.ficha())
 
     # 2. CICLO TECNOLOGIA E COMPORTAMENTO
     print("\n--- CICLO: TECNOLOGIA E COMPORTAMENTO ---")
@@ -400,7 +406,7 @@ if __name__ == "__main__":
 
     # 5. TESTE DE DECISÃO DA AI
     print("\n--- ANÁLISE E DECISÃO DA AI (UTILITY SCORING) ---")
-    print(ai.analisar(vilao_inimigo))
+    imprimir_dicionario_formatado("Análise da AI sobre o Inimigo", ai.analisar(vilao_inimigo))
 
     vilao_inimigo.hp = 15 # Deixa o vilão fraco para a AI decidir
     decisao = ai.decidir_acao_npc(vilao_inimigo, owner) # AI decide a ação do vilão
