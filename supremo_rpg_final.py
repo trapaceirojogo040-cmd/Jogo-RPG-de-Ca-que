@@ -155,6 +155,15 @@ class Personagem:
             "Rank": self.rank, "Nível": self.nivel
         }
 
+def imprimir_ficha(personagem: Personagem):
+    """Imprime a ficha do personagem de forma visualmente agradável."""
+    ficha = personagem.ficha()
+    print(f"\u001B[95m--- Ficha de Personagem: {ficha['Nome']} ---")
+    print(f"\u001B[96mCargo: \u001B[97m{ficha['Cargo']:<15} \u001B[96mRaça: \u001B[97m{ficha['Raça']:<15} \u001B[96mClasse: \u001B[97m{ficha['Classe']}")
+    print(f"\u001B[92mHP: \u001B[97m{ficha['HP']:<18} \u001B[93mXP: \u001B[97m{ficha['XP']:<17} \u001B[93mOuro: \u001B[97m{ficha['Ouro']}")
+    print(f"\u001B[91mRank: \u001B[97m{ficha['Rank']:<17} \u001B[94mNível: \u001B[97m{ficha['Nível']}")
+    print("\u001B[95m--------------------------------------------------\u001B[0m")
+
 # 4. --- MÓDULO DE COMANDO E PROTOCOLO (Confirmação Militar) ---
 class ComandoProtocolo:
     """Gerencia a confirmação de operações críticas (Hierarquia e Segurança)."""
@@ -322,7 +331,7 @@ class AI_NPC:
         health_ratio_alvo = alvo.hp / hp_max_estimado_alvo
 
         # Pontuação de saúde do NPC (0=morto, 1=saudável). Sigmoid faz a pontuação cair drasticamente abaixo de 50%
-        health_score_npc = self._sigmoid(health_ratio_npc)
+        health_score_npc = AI_NPC._sigmoid(health_ratio_npc)
 
         # Pontuação para ATACAR: útil se o NPC está saudável E o alvo está ferido.
         score_atacar = health_score_npc * 0.6 + (1 - health_ratio_alvo) * 0.4
@@ -380,7 +389,7 @@ if __name__ == "__main__":
 
     print("\n--- STATUS DE HIERARQUIA E BASE ---")
     print(base.status())
-    print(owner.ficha())
+    imprimir_ficha(owner)
 
     # 2. CICLO TECNOLOGIA E COMPORTAMENTO
     print("\n--- CICLO: TECNOLOGIA E COMPORTAMENTO ---")
