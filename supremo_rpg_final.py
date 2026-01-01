@@ -8,6 +8,12 @@ import math
 import hashlib
 from datetime import datetime, timedelta
 from typing import Dict, List, Any
+import os
+import sys
+from dotenv import load_dotenv
+
+# 🛡️ Sentinel: Load environment variables from .env file for secure configuration.
+load_dotenv()
 
 # 1. --- MÓDULO DE SEGURANÇA E PODER PSICOLÓGICO ---
 class ProtocoloDePoder:
@@ -69,7 +75,15 @@ ACOES_MILITARES = {
     "DESCOBERTA_PLANETA": {"risco": 0.5, "consumo_eter": 30, "recompensa_xp": 250},
     "ATAQUE_TOTAL": {"risco": 0.8, "consumo_eter": 40, "recompensa_xp": 400}
 }
-SENHA_BASE = "edson4020SS" # Base para geração do código de confirmação
+
+# 🛡️ Sentinel: Load the secret seed from environment variables.
+# This is a critical security measure to prevent hardcoded secrets in the codebase.
+SENHA_BASE = os.getenv("SENHA_BASE")
+if not SENHA_BASE:
+    print("\u001B[91m[CRITICAL] Security Error: SENHA_BASE environment variable not set.\u001B[0m")
+    print("Please create a .env file and add SENHA_BASE='your_secret_seed_here'.")
+    sys.exit(1) # Exit the application with a non-zero status code to indicate an error.
+
 
 def rank_xp(xp):
     """Calcula o Rank de poder (F, E, C, B, A, S, Lenda) baseado na XP total."""
