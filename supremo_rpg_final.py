@@ -155,6 +155,21 @@ class Personagem:
             "Rank": self.rank, "Nível": self.nivel
         }
 
+    def exibir_ficha_formatada(self):
+        """Retorna uma string formatada e colorida da ficha do personagem."""
+        # 🎨 Palette: Melhorando a legibilidade da ficha do personagem com cores e formatação.
+        ficha_info = self.ficha()
+        lines = [
+            f"\n\u001B[95m--- FICHA DE PERSONAGEM ---\u001B[0m",
+            f" \u001B[96mNome:\u001B[0m {ficha_info['Nome']:<15} \u001B[96mCargo:\u001B[0m {ficha_info['Cargo']}",
+            f" \u001B[96mRaça:\u001B[0m {ficha_info['Raça']:<15} \u001B[96mClasse:\u001B[0m {ficha_info['Classe']}",
+            f"\u001B[90m-----------------------------------\u001B[0m",
+            f" \u001B[92mPV:\u001B[0m {ficha_info['PV']:<8} \u001B[93mXP:\u001B[0m {ficha_info['XP']:<8} \u001B[93mOuro:\u001B[0m {ficha_info['Ouro']}",
+            f" \u001B[91mRank:\u001B[0m {ficha_info['Rank']:<8} \u001B[94mNível:\u001B[0m {ficha_info['Nível']}",
+            f"\u001B[90m-----------------------------------\u001B[0m"
+        ]
+        return "\n".join(lines)
+
 # 4. --- MÓDULO DE COMANDO E PROTOCOLO (Confirmação Militar) ---
 class ProtocoloDeComando:
     """Gerencia a confirmação de operações críticas (Hierarquia e Segurança)."""
@@ -380,7 +395,7 @@ if __name__ == "__main__":
 
     print("\n--- STATUS DE HIERARQUIA E BASE ---")
     print(base.status())
-    print(proprietario.ficha())
+    print(proprietario.exibir_ficha_formatada())
 
     # 2. CICLO TECNOLOGIA E COMPORTAMENTO
     print("\n--- CICLO: TECNOLOGIA E COMPORTAMENTO ---")
