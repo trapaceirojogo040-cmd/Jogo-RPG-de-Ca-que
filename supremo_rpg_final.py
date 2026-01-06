@@ -355,6 +355,19 @@ class IA_NPC:
                 "Poder Tático (Hierarquia)": personagem.nivel * (1 + CARGOS.index(personagem.cargo)/5),
                 "Rank de XP": personagem.rank}
 
+
+def exibir_ficha(personagem: Personagem):
+    """Exibe a ficha do personagem de forma formatada e legível."""
+    # 🎨 Palette: Melhora a UX da ficha do personagem com formatação limpa e cores.
+    ficha = personagem.ficha()
+    titulo_cor = "\u001B[95m"
+    reset_cor = "\u001B[0m"
+    print(f"{titulo_cor}--- Ficha de Personagem ---{reset_cor}")
+    for chave, valor in ficha.items():
+        print(f"  {chave:<10}: {valor}")
+    print(f"{titulo_cor}---------------------------{reset_cor}")
+
+
 # 7. --- TESTE E EXECUÇÃO SIMULADA ---
 if __name__ == "__main__":
 
@@ -380,7 +393,7 @@ if __name__ == "__main__":
 
     print("\n--- STATUS DE HIERARQUIA E BASE ---")
     print(base.status())
-    print(proprietario.ficha())
+    exibir_ficha(proprietario)
 
     # 2. CICLO TECNOLOGIA E COMPORTAMENTO
     print("\n--- CICLO: TECNOLOGIA E COMPORTAMENTO ---")
