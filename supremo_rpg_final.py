@@ -48,7 +48,12 @@ CLASSES = ['Guerreiro', 'Mago', 'Comandante', 'Engenheiro', 'Assassino', 'Espada
 RACAS = ['Humano', 'Elfo', 'Orc', 'Demônio', 'Androide', 'IA']
 ARMAS = ['Espada Laser', 'Fuzil de Plasma', 'Varinha Arcana', 'Canhão Orbital']
 TECNOLOGIAS = ['Campo de Força Quântico', 'Nanobots de Reparo', 'Bombardeio Orbital', 'Teleportador Tático', 'IA Defensiva']
-CARGOS = ['OWNER', 'Administrador', 'Diretor', 'Master GM', 'Game Master', 'Moderador', 'Jogador']
+# ⚡ Bolt: Converted CARGOS list to a dictionary for O(1) lookup.
+# This avoids the O(n) list.index() call in performance-sensitive logic.
+CARGOS = {
+    'OWNER': 0, 'Administrador': 1, 'Diretor': 2, 'Master GM': 3,
+    'Game Master': 4, 'Moderador': 5, 'Jogador': 6
+}
 
 # Definições de Comportamento Militar
 PHRASES_MILITARES: Dict[str, str] = {
@@ -164,7 +169,8 @@ class ProtocoloDeComando:
         """
         Gera o Código de Confirmação, agora incluindo o status de comportamento para maior segurança.
         """
-        complexidade = nivel_tecnologico * 10 + CARGOS.index(cargo_emissor)
+        # ⚡ Bolt: Using O(1) dictionary lookup instead of O(n) list.index().
+        complexidade = nivel_tecnologico * 10 + CARGOS.get(cargo_emissor, 6) # Default to 'Jogador'
         semente = f"{acao_chave}:{SENHA_BASE}:{complexidade}:{status_comportamento}"
         codigo = hashlib.sha256(semente.encode()).hexdigest()[:6].upper()
         return codigo
@@ -350,9 +356,13 @@ class IA_NPC:
     def analisar(self, personagem: Personagem) -> Dict[str, Any]:
         """Gera uma análise completa do perfil do personagem (Análise e Teste)."""
         perfil = "Agressivo" if personagem.xp > 500 else "Neutro"
+        # ⚡ Bolt: Using O(1) dictionary lookup instead of O(n) list.index().
+        cargo_index = CARGOS.get(personagem.cargo, 6) # Default to 'Jogador'
+        poder_tatico = personagem.nivel * (1 + cargo_index / 5)
+
         return {"Nome": personagem.nome,"Cargo": personagem.cargo,"Perfil": perfil,
                 "Raça/Classe": f"{personagem.raca} / {personagem.classe}",
-                "Poder Tático (Hierarquia)": personagem.nivel * (1 + CARGOS.index(personagem.cargo)/5),
+                "Poder Tático (Hierarquia)": poder_tatico,
                 "Rank de XP": personagem.rank}
 
 # 7. --- TESTE E EXECUÇÃO SIMULADA ---
