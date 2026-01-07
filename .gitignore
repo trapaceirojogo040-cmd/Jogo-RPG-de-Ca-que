@@ -19,4 +19,8 @@ rad.json
 #License-file
 *.flf
 #Test results file
-TestResults.xml\n# Ignore environment variables file\n.env
+TestResults.xml
+
+# 🛡️ Sentinel: Ignorar arquivos de ambiente para evitar o vazamento de segredos.
+# O arquivo .env contém variáveis sensíveis e nunca deve ser versionado.
+.env
