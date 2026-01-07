@@ -356,6 +356,16 @@ class IA_NPC:
                 "Rank de XP": personagem.rank}
 
 # 7. --- TESTE E EXECUÇÃO SIMULADA ---
+def exibir_ficha_formatada(personagem: Personagem):
+    """Exibe a ficha do personagem de forma formatada e legível."""
+    ficha = personagem.ficha()
+    print(f"\n\u001B[95m--- Ficha de Personagem: {ficha['Nome']} ---\u001B[0m")
+    for chave, valor in ficha.items():
+        if chave != "Nome":
+            print(f"  \u001B[96m{chave}:\u001B[0m {valor}")
+    print("\u001B[95m---------------------------------------\u001B[0m")
+
+
 if __name__ == "__main__":
 
     print("==== SUPREMO RPG AI: INÍCIO DA EXECUÇÃO (DEMO CONCEITUAL) ====")
@@ -380,7 +390,7 @@ if __name__ == "__main__":
 
     print("\n--- STATUS DE HIERARQUIA E BASE ---")
     print(base.status())
-    print(proprietario.ficha())
+    exibir_ficha_formatada(proprietario)
 
     # 2. CICLO TECNOLOGIA E COMPORTAMENTO
     print("\n--- CICLO: TECNOLOGIA E COMPORTAMENTO ---")
