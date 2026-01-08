@@ -8,6 +8,11 @@ import math
 import hashlib
 from datetime import datetime, timedelta
 from typing import Dict, List, Any
+import os
+import sys
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # 1. --- MÓDULO DE SEGURANÇA E PODER PSICOLÓGICO ---
 class ProtocoloDePoder:
@@ -69,7 +74,9 @@ ACOES_MILITARES = {
     "DESCOBERTA_PLANETA": {"risco": 0.5, "consumo_eter": 30, "recompensa_xp": 250},
     "ATAQUE_TOTAL": {"risco": 0.8, "consumo_eter": 40, "recompensa_xp": 400}
 }
-SENHA_BASE = "edson4020SS" # Base para geração do código de confirmação
+# 🛡️ Sentinel: A senha base NUNCA deve ser hardcoded.
+# Movido para variável de ambiente para proteger contra exposição.
+SENHA_BASE = os.environ.get("SENHA_BASE")
 
 def rank_xp(xp):
     """Calcula o Rank de poder (F, E, C, B, A, S, Lenda) baseado na XP total."""
@@ -357,6 +364,14 @@ class IA_NPC:
 
 # 7. --- TESTE E EXECUÇÃO SIMULADA ---
 if __name__ == "__main__":
+    # 🛡️ Sentinel: Validação de segurança crítica.
+    # A aplicação não pode operar de forma segura sem a SENHA_BASE.
+    # Encerra imediatamente se a variável de ambiente não estiver configurada.
+    if not SENHA_BASE:
+        print("\u001B[91m[ERRO CRÍTICO DE SEGURANÇA] A variável de ambiente SENHA_BASE não foi definida.")
+        print("Por favor, crie um arquivo .env e defina SENHA_BASE para continuar.")
+        print("Consulte o arquivo .env.example para mais detalhes.\u001B[0m")
+        sys.exit(1) # Encerra o script com um código de erro
 
     print("==== SUPREMO RPG AI: INÍCIO DA EXECUÇÃO (DEMO CONCEITUAL) ====")
 
