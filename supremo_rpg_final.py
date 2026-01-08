@@ -50,6 +50,18 @@ ARMAS = ['Espada Laser', 'Fuzil de Plasma', 'Varinha Arcana', 'Canhão Orbital']
 TECNOLOGIAS = ['Campo de Força Quântico', 'Nanobots de Reparo', 'Bombardeio Orbital', 'Teleportador Tático', 'IA Defensiva']
 CARGOS = ['OWNER', 'Administrador', 'Diretor', 'Master GM', 'Game Master', 'Moderador', 'Jogador']
 
+# 🎨 Palette: Adicionando cores para os ranks para melhorar a legibilidade da ficha do personagem.
+RANK_CORES = {
+    'Lenda': '\u001B[95m',  # Roxo/Magenta
+    'S': '\u001B[93m',      # Amarelo
+    'A': '\u001B[96m',      # Ciano
+    'B': '\u001B[94m',      # Azul
+    'C': '\u001B[92m',      # Verde
+    'E': '\u001B[90m',      # Cinza
+    'F': '\u001B[91m',      # Vermelho
+}
+
+
 # Definições de Comportamento Militar
 PHRASES_MILITARES: Dict[str, str] = {
     "ATAQUE_TOTAL": "O preço da vitória é a preparação",
@@ -154,6 +166,22 @@ class Personagem:
             "PV": self.pv, "XP": self.xp, "Ouro": self.ouro,
             "Rank": self.rank, "Nível": self.nivel
         }
+
+    def exibir_ficha(self):
+        """🎨 Palette: Exibe a ficha do personagem de forma legível e colorida para uma melhor UX."""
+        reset_cor = "\u001B[0m"
+        cor_rank = RANK_CORES.get(self.rank, reset_cor)
+
+        print("\n" + "="*40)
+        print(f"  FICHA DE PERSONAGEM: {self.nome}".center(40))
+        print("="*40)
+        print(f"  Cargo: {self.cargo:<15} Raça: {self.raca}")
+        print(f"  Classe: {self.classe:<14} Nível: {self.nivel}")
+        print("-"*40)
+        print(f"  PV: \u001B[92m{self.pv:<6}{reset_cor} Ouro: \u001B[93m{self.ouro:<6}{reset_cor}")
+        print(f"  XP: \u001B[94m{self.xp:<6}{reset_cor} Rank: {cor_rank}{self.rank}{reset_cor}")
+        print("="*40 + "\n")
+
 
 # 4. --- MÓDULO DE COMANDO E PROTOCOLO (Confirmação Militar) ---
 class ProtocoloDeComando:
@@ -380,7 +408,7 @@ if __name__ == "__main__":
 
     print("\n--- STATUS DE HIERARQUIA E BASE ---")
     print(base.status())
-    print(proprietario.ficha())
+    proprietario.exibir_ficha()
 
     # 2. CICLO TECNOLOGIA E COMPORTAMENTO
     print("\n--- CICLO: TECNOLOGIA E COMPORTAMENTO ---")
