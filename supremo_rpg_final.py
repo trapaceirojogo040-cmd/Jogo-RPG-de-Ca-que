@@ -355,6 +355,22 @@ class IA_NPC:
                 "Poder Tático (Hierarquia)": personagem.nivel * (1 + CARGOS.index(personagem.cargo)/5),
                 "Rank de XP": personagem.rank}
 
+# 🎨 Palette: Helper para exibir dicionários de forma legível e colorida.
+def exibir_status_formatado(titulo: str, dados: Dict[str, Any]):
+    """Exibe um dicionário de status de forma formatada e colorida."""
+    print(f"\n\u001B[95m--- {titulo.upper()} ---\u001B[0m")
+    for chave, valor in dados.items():
+        chave_formatada = f"\u001B[96m{chave.replace('_', ' ').title()}:\u001B[0m"
+        if isinstance(valor, dict):
+            print(f"  {chave_formatada}")
+            for sub_chave, sub_valor in valor.items():
+                print(f"    - {sub_chave}: {sub_valor}")
+        else:
+            # Garante alinhamento para uma aparência de tabela limpa
+            print(f"  {chave_formatada:<30} {valor}")
+    print("\u001B[95m" + "-" * (len(titulo) + 6) + "\u001B[0m")
+
+
 # 7. --- TESTE E EXECUÇÃO SIMULADA ---
 if __name__ == "__main__":
 
@@ -379,8 +395,8 @@ if __name__ == "__main__":
     storage.logins[agente_inativo.id] = datetime.now() - timedelta(days=31)
 
     print("\n--- STATUS DE HIERARQUIA E BASE ---")
-    print(base.status())
-    print(proprietario.ficha())
+    exibir_status_formatado("Status da Base", base.status())
+    exibir_status_formatado("Ficha do Proprietário", proprietario.ficha())
 
     # 2. CICLO TECNOLOGIA E COMPORTAMENTO
     print("\n--- CICLO: TECNOLOGIA E COMPORTAMENTO ---")
