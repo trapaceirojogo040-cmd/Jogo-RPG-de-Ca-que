@@ -6,6 +6,7 @@ import random
 import uuid
 import math
 import hashlib
+import bisect
 from datetime import datetime, timedelta
 from typing import Dict, List, Any
 
@@ -72,12 +73,16 @@ ACOES_MILITARES = {
 SENHA_BASE = "edson4020SS" # Base para geração do código de confirmação
 
 def rank_xp(xp):
-    """Calcula o Rank de poder (F, E, C, B, A, S, Lenda) baseado na XP total."""
+    """
+    Calcula o Rank de poder (F, E, C, B, A, S, Lenda) baseado na XP total.
+    ⚡ Bolt Optimization: Replaced O(n) linear search with O(log n) binary search.
+    """
     limites = [100, 500, 2500, 8000, 30000, 70000, 99999999]
     tags = ['F', 'E', 'C', 'B', 'A', 'S', 'Lenda']
-    for i, v in enumerate(limites):
-        if xp < v: return tags[i]
-    return tags[-1]
+    # ⚡ bisect_left finds the insertion point for xp, which corresponds to the rank.
+    # This is significantly faster for large, sorted lists.
+    index = bisect.bisect_left(limites, xp)
+    return tags[index] if index < len(tags) else tags[-1]
 
 class ContaUsuario:
     """Classe simples para simular autenticação do OWNER."""
