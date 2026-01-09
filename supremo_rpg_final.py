@@ -355,7 +355,33 @@ class IA_NPC:
                 "Poder Tático (Hierarquia)": personagem.nivel * (1 + CARGOS.index(personagem.cargo)/5),
                 "Rank de XP": personagem.rank}
 
-# 7. --- TESTE E EXECUÇÃO SIMULADA ---
+# 7. --- FUNÇÃO AUXILIAR PARA IMPRESSÃO ---
+def imprimir_caixa(titulo: str, dados: Dict[str, Any]):
+    """
+    Imprime um dicionário de dados em uma caixa formatada e colorida.
+    🎨 Palette: Esta função melhora a UX ao apresentar dados complexos
+    de forma clara e visualmente organizada no terminal.
+    """
+    # Cor magenta para o título
+    cor_titulo = "\u001B[95m"
+    # Cor ciano para as chaves e branco para os valores
+    cor_chave = "\u001B[96m"
+    cor_valor = "\u001B[97m"
+    cor_reset = "\u001B[0m"
+
+    print(f"\n{cor_titulo}--- {titulo.upper()} ---{cor_reset}")
+    for chave, valor in dados.items():
+        # Formata dicionários aninhados de forma especial
+        if isinstance(valor, dict):
+            print(f"  {cor_chave}{chave}:{cor_reset}")
+            for sub_chave, sub_valor in valor.items():
+                print(f"    - {cor_chave}{sub_chave}: {cor_valor}{sub_valor}{cor_reset}")
+        else:
+            print(f"  {cor_chave}{chave}: {cor_valor}{valor}{cor_reset}")
+    print(f"{cor_titulo}--------------------{cor_reset}")
+
+
+# 8. --- TESTE E EXECUÇÃO SIMULADA ---
 if __name__ == "__main__":
 
     print("==== SUPREMO RPG AI: INÍCIO DA EXECUÇÃO (DEMO CONCEITUAL) ====")
@@ -379,8 +405,8 @@ if __name__ == "__main__":
     storage.logins[agente_inativo.id] = datetime.now() - timedelta(days=31)
 
     print("\n--- STATUS DE HIERARQUIA E BASE ---")
-    print(base.status())
-    print(proprietario.ficha())
+    imprimir_caixa("Status da Base", base.status())
+    imprimir_caixa(f"Ficha de {proprietario.nome}", proprietario.ficha())
 
     # 2. CICLO TECNOLOGIA E COMPORTAMENTO
     print("\n--- CICLO: TECNOLOGIA E COMPORTAMENTO ---")
