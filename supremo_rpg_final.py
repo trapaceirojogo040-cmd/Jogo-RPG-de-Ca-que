@@ -355,7 +355,23 @@ class IA_NPC:
                 "Poder Tático (Hierarquia)": personagem.nivel * (1 + CARGOS.index(personagem.cargo)/5),
                 "Rank de XP": personagem.rank}
 
-# 7. --- TESTE E EXECUÇÃO SIMULADA ---
+# 7. --- FUNÇÃO AUXILIAR PARA FORMATAÇÃO DE SAÍDA ---
+def imprimir_dicionario_formatado(dicionario: Dict[str, Any], titulo: str):
+    """
+    🎨 Palette: Imprime um dicionário com formatação colorida para melhor UX no terminal.
+    """
+    print(f"\n\u001B[95m--- {titulo.upper()} ---\u001B[0m")
+    for chave, valor in dicionario.items():
+        if isinstance(valor, dict):
+            print(f"\u001B[96m{chave}:\u001B[0m")
+            for sub_chave, sub_valor in valor.items():
+                print(f"  \u001B[93m{sub_chave}:\u001B[0m {sub_valor}")
+        else:
+            print(f"\u001B[96m{chave}:\u001B[0m \u001B[92m{valor}\u001B[0m")
+    print(f"\u001B[95m---------------------\u001B[0m")
+
+
+# 8. --- TESTE E EXECUÇÃO SIMULADA ---
 if __name__ == "__main__":
 
     print("==== SUPREMO RPG AI: INÍCIO DA EXECUÇÃO (DEMO CONCEITUAL) ====")
@@ -378,9 +394,9 @@ if __name__ == "__main__":
     agente_inativo = Personagem("Inativo", cargo="Jogador")
     storage.logins[agente_inativo.id] = datetime.now() - timedelta(days=31)
 
-    print("\n--- STATUS DE HIERARQUIA E BASE ---")
-    print(base.status())
-    print(proprietario.ficha())
+    # 🎨 Palette: Apresenta o status inicial com a nova formatação para melhor UX.
+    imprimir_dicionario_formatado(base.status(), "Status da Base")
+    imprimir_dicionario_formatado(proprietario.ficha(), "Ficha do Comandante")
 
     # 2. CICLO TECNOLOGIA E COMPORTAMENTO
     print("\n--- CICLO: TECNOLOGIA E COMPORTAMENTO ---")
