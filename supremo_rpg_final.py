@@ -356,6 +356,19 @@ class IA_NPC:
                 "Rank de XP": personagem.rank}
 
 # 7. --- TESTE E EXECUÇÃO SIMULADA ---
+
+# 🎨 Palette: Helper para imprimir dicionários de forma legível e colorida.
+def imprimir_status_formatado(titulo: str, dados: Dict[str, Any]):
+    """Imprime um dicionário com um título estilizado e cores para melhor UX."""
+    print(f"\n\u001B[95m--- {titulo.upper()} ---\u001B[0m")
+    for chave, valor in dados.items():
+        if isinstance(valor, dict):
+            print(f"  \u001B[96m{chave}:\u001B[0m")
+            for sub_chave, sub_valor in valor.items():
+                print(f"    - \u001B[93m{sub_chave}:\u001B[0m {sub_valor}")
+        else:
+            print(f"  \u001B[96m{chave}:\u001B[0m {valor}")
+    print("\u001B[95m-----------------------------------\u001B[0m")
 if __name__ == "__main__":
 
     print("==== SUPREMO RPG AI: INÍCIO DA EXECUÇÃO (DEMO CONCEITUAL) ====")
@@ -379,8 +392,8 @@ if __name__ == "__main__":
     storage.logins[agente_inativo.id] = datetime.now() - timedelta(days=31)
 
     print("\n--- STATUS DE HIERARQUIA E BASE ---")
-    print(base.status())
-    print(proprietario.ficha())
+    imprimir_status_formatado("Status da Base", base.status())
+    imprimir_status_formatado(f"Ficha de {proprietario.nome}", proprietario.ficha())
 
     # 2. CICLO TECNOLOGIA E COMPORTAMENTO
     print("\n--- CICLO: TECNOLOGIA E COMPORTAMENTO ---")
