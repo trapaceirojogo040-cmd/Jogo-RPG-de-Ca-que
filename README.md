@@ -1,2 +1,2 @@
 # Jogo-RPG-de-Ca-que
-Jogo RPG de Caíque: Estratégia Militar Avançada ​Simulação estratégica profunda. Gerencie a MilitaryBase, recursos (Ouro, Éter) e tecnologia ramificada. O AIProtocol oferece análises de risco. Recrute Characters com habilidades detalhadas e Afinidade (Harém/Romance) para aprimorar a Força Bélica. Seinen/Fantasia/Drama.
+Jogo RPG de Caíque: Estratégia Militar Avançada. Uma simulação estratégica profunda onde você gerencia sua Base Militar, recursos como Ouro e Éter, e uma árvore tecnológica ramificada. O Protocolo de IA oferece análises de risco táticas para suas missões. Recrute Personagens com habilidades detalhadas e desenvolva Afinidade (Harém/Romance) para aprimorar sua Força Bélica. Gêneros: Seinen/Fantasia/Drama.
