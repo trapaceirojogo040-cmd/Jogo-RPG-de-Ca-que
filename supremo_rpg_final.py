@@ -356,6 +356,26 @@ class IA_NPC:
                 "Rank de XP": personagem.rank}
 
 # 7. --- TESTE E EXECUÇÃO SIMULADA ---
+def imprimir_status_formatado(titulo: str, dados: Dict[str, Any]):
+    """Imprime um dicionário de status formatado com cores e alinhamento."""
+    print(f"\n\u001B[95m--- {titulo.upper()} ---\u001B[0m")
+    if not dados:
+        print("  Nenhum dado para exibir.")
+        return
+
+    # 🎨 Palette: Calcula o preenchimento dinâmico para alinhar os valores.
+    max_len_chave = max(len(str(chave)) for chave in dados.keys()) + 1
+
+    for chave, valor in dados.items():
+        if isinstance(valor, dict):
+            valor_str = ', '.join([f'{k}: {v}' for k, v in valor.items()])
+        else:
+            valor_str = str(valor)
+
+        # 🎨 Palette: Aplica cores para melhor legibilidade.
+        print(f"  \u001B[96m{str(chave).ljust(max_len_chave)}: \u001B[93m{valor_str}\u001B[0m")
+
+
 if __name__ == "__main__":
 
     print("==== SUPREMO RPG AI: INÍCIO DA EXECUÇÃO (DEMO CONCEITUAL) ====")
@@ -378,9 +398,8 @@ if __name__ == "__main__":
     agente_inativo = Personagem("Inativo", cargo="Jogador")
     storage.logins[agente_inativo.id] = datetime.now() - timedelta(days=31)
 
-    print("\n--- STATUS DE HIERARQUIA E BASE ---")
-    print(base.status())
-    print(proprietario.ficha())
+    imprimir_status_formatado("STATUS DE HIERARQUIA E BASE", base.status())
+    imprimir_status_formatado("FICHA DO PROPRIETÁRIO", proprietario.ficha())
 
     # 2. CICLO TECNOLOGIA E COMPORTAMENTO
     print("\n--- CICLO: TECNOLOGIA E COMPORTAMENTO ---")
@@ -399,8 +418,7 @@ if __name__ == "__main__":
     storage.execute_entropy_protocol()
 
     # 5. TESTE DE DECISÃO DA AI
-    print("\n--- ANÁLISE E DECISÃO DA AI (UTILITY SCORING) ---")
-    print(ai.analisar(vilao_inimigo))
+    imprimir_status_formatado(f"ANÁLISE DE {vilao_inimigo.nome}", ai.analisar(vilao_inimigo))
 
     vilao_inimigo.pv = 15 # Deixa o vilão fraco para a AI decidir
     decisao = ai.decidir_acao_npc(vilao_inimigo, proprietario) # AI decide a ação do vilão
