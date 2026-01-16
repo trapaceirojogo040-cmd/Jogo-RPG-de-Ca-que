@@ -6,8 +6,13 @@ import random
 import uuid
 import math
 import hashlib
+import os
 from datetime import datetime, timedelta
 from typing import Dict, List, Any
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 # 1. --- MÓDULO DE SEGURANÇA E PODER PSICOLÓGICO ---
 class ProtocoloDePoder:
@@ -69,7 +74,8 @@ ACOES_MILITARES = {
     "DESCOBERTA_PLANETA": {"risco": 0.5, "consumo_eter": 30, "recompensa_xp": 250},
     "ATAQUE_TOTAL": {"risco": 0.8, "consumo_eter": 40, "recompensa_xp": 400}
 }
-SENHA_BASE = "edson4020SS" # Base para geração do código de confirmação
+# 🛡️ Sentinel: Carregando a chave secreta a partir de variáveis de ambiente para evitar hardcoding.
+SENHA_BASE = os.environ.get("SENHA_BASE", "fallback_secret_key_for_development")
 
 def rank_xp(xp):
     """Calcula o Rank de poder (F, E, C, B, A, S, Lenda) baseado na XP total."""
@@ -391,7 +397,8 @@ if __name__ == "__main__":
     print("\n--- CICLO: PROTOCOLO MILITAR ---")
     acao_alvo = "ATAQUE_TOTAL"
     codigo_npc_correto = protocolo.gerar_codigo_confirmacao(acao_alvo, tec.nivel, npc_diretor.cargo, base.status_comportamento)
-    print(f"\u001B[90m[DEBUG] Código de Confirmação para '{acao_alvo}': {codigo_npc_correto}\u001B[0m")
+    # 🛡️ Sentinel: A linha de depuração que expunha o código de confirmação foi removida.
+    # print(f"\u001B[90m[DEBUG] Código de Confirmação para '{acao_alvo}': {codigo_npc_correto}\u001B[0m")
     protocolo.validar_operacao_militar(npc_diretor, acao_alvo, codigo_npc_correto, base)
 
     # 4. CICLO DE SEGURANÇA (ENTROPIA)
