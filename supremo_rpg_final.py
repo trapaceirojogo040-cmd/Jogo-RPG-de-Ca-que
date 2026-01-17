@@ -355,7 +355,21 @@ class IA_NPC:
                 "Poder Tático (Hierarquia)": personagem.nivel * (1 + CARGOS.index(personagem.cargo)/5),
                 "Rank de XP": personagem.rank}
 
-# 7. --- TESTE E EXECUÇÃO SIMULADA ---
+# 7. --- FUNÇÃO DE FORMATAÇÃO DE SAÍDA ---
+def formatar_dicionario(titulo: str, dados: Dict[str, Any]) -> str:
+    """Formata um dicionário em uma string bonita e colorida para o console."""
+    # 🎨 Palette: Adiciona um título destacado e calcula o preenchimento para alinhar os valores.
+    saida = [f"\u001B[95m--- {titulo.upper()} ---\u001B[0m"]
+    if not dados:
+        return f"{saida[0]}\n (Vazio)"
+
+    max_chave = max(len(str(k)) for k in dados.keys()) + 1
+    for chave, valor in dados.items():
+        chave_formatada = f"\u001B[96m{str(chave):<{max_chave}}\u001B[0m"
+        saida.append(f"  {chave_formatada}: \u001B[93m{valor}\u001B[0m")
+    return "\n".join(saida)
+
+# 8. --- TESTE E EXECUÇÃO SIMULADA ---
 if __name__ == "__main__":
 
     print("==== SUPREMO RPG AI: INÍCIO DA EXECUÇÃO (DEMO CONCEITUAL) ====")
@@ -379,8 +393,8 @@ if __name__ == "__main__":
     storage.logins[agente_inativo.id] = datetime.now() - timedelta(days=31)
 
     print("\n--- STATUS DE HIERARQUIA E BASE ---")
-    print(base.status())
-    print(proprietario.ficha())
+    print(formatar_dicionario(f"Status da Base: {base.nome}", base.status()))
+    print(formatar_dicionario(f"Ficha de Personagem: {proprietario.nome}", proprietario.ficha()))
 
     # 2. CICLO TECNOLOGIA E COMPORTAMENTO
     print("\n--- CICLO: TECNOLOGIA E COMPORTAMENTO ---")
@@ -400,7 +414,7 @@ if __name__ == "__main__":
 
     # 5. TESTE DE DECISÃO DA AI
     print("\n--- ANÁLISE E DECISÃO DA AI (UTILITY SCORING) ---")
-    print(ai.analisar(vilao_inimigo))
+    print(formatar_dicionario(f"Análise de IA: {vilao_inimigo.nome}", ai.analisar(vilao_inimigo)))
 
     vilao_inimigo.pv = 15 # Deixa o vilão fraco para a AI decidir
     decisao = ai.decidir_acao_npc(vilao_inimigo, proprietario) # AI decide a ação do vilão
