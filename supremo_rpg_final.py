@@ -2,12 +2,17 @@
 # Arquitetura Unificada de RPG de Estratégia, Hierarquia, Economia e Protocolo AI.
 # O foco é na interdependência dos módulos: Tecnologia afeta Protocolo e Economia.
 
+import os
 import random
 import uuid
 import math
 import hashlib
 from datetime import datetime, timedelta
 from typing import Dict, List, Any
+from dotenv import load_dotenv
+
+# 🛡️ Sentinel: Carrega as variáveis de ambiente do arquivo .env
+load_dotenv()
 
 # 1. --- MÓDULO DE SEGURANÇA E PODER PSICOLÓGICO ---
 class ProtocoloDePoder:
@@ -69,7 +74,13 @@ ACOES_MILITARES = {
     "DESCOBERTA_PLANETA": {"risco": 0.5, "consumo_eter": 30, "recompensa_xp": 250},
     "ATAQUE_TOTAL": {"risco": 0.8, "consumo_eter": 40, "recompensa_xp": 400}
 }
-SENHA_BASE = "edson4020SS" # Base para geração do código de confirmação
+# 🛡️ Sentinel: CRITICAL - A senha base foi movida para variáveis de ambiente.
+# O valor padrão é inseguro e serve apenas para desenvolvimento.
+# Crie um arquivo .env e defina SENHA_BASE para um valor seguro.
+SENHA_BASE = os.getenv("SENHA_BASE", "insecure_default_for_dev")
+if SENHA_BASE == "insecure_default_for_dev":
+    print("\u001B[93m[AVISO DE SEGURANÇA] A SENHA_BASE está usando um valor padrão inseguro. Configure-a no seu arquivo .env para produção.\u001B[0m")
+
 
 def rank_xp(xp):
     """Calcula o Rank de poder (F, E, C, B, A, S, Lenda) baseado na XP total."""
