@@ -19,4 +19,6 @@ rad.json
 #License-file
 *.flf
 #Test results file
-TestResults.xml\n# Ignore environment variables file\n.env
+TestResults.xml
+# Ignorar arquivo de variáveis de ambiente
+.env
