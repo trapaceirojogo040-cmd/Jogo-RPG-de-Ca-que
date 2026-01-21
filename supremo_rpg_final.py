@@ -72,12 +72,24 @@ ACOES_MILITARES = {
 SENHA_BASE = "edson4020SS" # Base para geração do código de confirmação
 
 def rank_xp(xp):
-    """Calcula o Rank de poder (F, E, C, B, A, S, Lenda) baseado na XP total."""
-    limites = [100, 500, 2500, 8000, 30000, 70000, 99999999]
-    tags = ['F', 'E', 'C', 'B', 'A', 'S', 'Lenda']
-    for i, v in enumerate(limites):
-        if xp < v: return tags[i]
-    return tags[-1]
+    """
+    ⚡ Bolt: Otimizado para evitar a iteração em lista. A verificação direta com if/elif é mais rápida.
+    Calcula o Rank de poder (F, E, C, B, A, S, Lenda) baseado na XP total.
+    """
+    if xp < 100:
+        return 'F'
+    elif xp < 500:
+        return 'E'
+    elif xp < 2500:
+        return 'C'
+    elif xp < 8000:
+        return 'B'
+    elif xp < 30000:
+        return 'A'
+    elif xp < 70000:
+        return 'S'
+    else:
+        return 'Lenda'
 
 class ContaUsuario:
     """Classe simples para simular autenticação do OWNER."""
