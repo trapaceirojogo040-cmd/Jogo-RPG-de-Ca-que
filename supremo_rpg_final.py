@@ -355,6 +355,20 @@ class IA_NPC:
                 "Poder Tático (Hierarquia)": personagem.nivel * (1 + CARGOS.index(personagem.cargo)/5),
                 "Rank de XP": personagem.rank}
 
+def imprimir_dados_formatados(titulo: str, dados: Dict[str, Any]):
+    """Imprime um dicionário de dados em um formato de tabela colorida e alinhada."""
+    print(f"\u001B[95m--- {titulo.upper()} ---\u001B[0m")
+    if not dados:
+        print(" (Vazio)")
+        return
+
+    max_len = max(len(chave) for chave in dados.keys()) if dados else 0
+
+    for chave, valor in dados.items():
+        chave_formatada = f"{chave}:".ljust(max_len + 2)
+        print(f"  \u001B[96m{chave_formatada}\u001B[0m {valor}")
+    print()
+
 # 7. --- TESTE E EXECUÇÃO SIMULADA ---
 if __name__ == "__main__":
 
@@ -378,9 +392,8 @@ if __name__ == "__main__":
     agente_inativo = Personagem("Inativo", cargo="Jogador")
     storage.logins[agente_inativo.id] = datetime.now() - timedelta(days=31)
 
-    print("\n--- STATUS DE HIERARQUIA E BASE ---")
-    print(base.status())
-    print(proprietario.ficha())
+    imprimir_dados_formatados("Status da Base", base.status())
+    imprimir_dados_formatados("Ficha do Proprietário", proprietario.ficha())
 
     # 2. CICLO TECNOLOGIA E COMPORTAMENTO
     print("\n--- CICLO: TECNOLOGIA E COMPORTAMENTO ---")
