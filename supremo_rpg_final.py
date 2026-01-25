@@ -35,13 +35,16 @@ class ServicoDeArmazenamento:
     def execute_entropy_protocol(self, max_days_inactive: int = 30):
         """Executa a Lei da Destruição de Dados (Entropia)."""
         cutoff_date = datetime.now() - timedelta(days=max_days_inactive)
-        keys_to_destroy = [
-            user_id for user_id, last_login in self.logins.items()
-            if last_login < cutoff_date
-        ]
-        for user_id in keys_to_destroy:
-            del self.logins[user_id]
-            print(f" [PROTOCOLO ENTROPIA]: Dados de {user_id[:8]} destruídos por inatividade.")
+        # ⚡ Bolt: For performance, we rebuild the dictionary in a single pass instead of
+        # deleting items one-by-one, which can trigger costly dictionary resizing.
+        # This approach iterates through the items once to build a new, smaller dictionary.
+        active_logins = {}
+        for user_id, last_login in self.logins.items():
+            if last_login < cutoff_date:
+                print(f" [PROTOCOLO ENTROPIA]: Dados de {user_id[:8]} destruídos por inatividade.")
+            else:
+                active_logins[user_id] = last_login
+        self.logins = active_logins
 
 # 2. --- CONFIGURAÇÃO GLOBAL E HIERARQUIA ---
 CLASSES = ['Guerreiro', 'Mago', 'Comandante', 'Engenheiro', 'Assassino', 'Espadachim', 'Clérigo']
