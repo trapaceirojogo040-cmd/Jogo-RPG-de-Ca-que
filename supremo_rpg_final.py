@@ -8,6 +8,8 @@ import math
 import hashlib
 from datetime import datetime, timedelta
 from typing import Dict, List, Any
+import os
+from dotenv import load_dotenv
 
 # 1. --- MÓDULO DE SEGURANÇA E PODER PSICOLÓGICO ---
 class ProtocoloDePoder:
@@ -69,7 +71,10 @@ ACOES_MILITARES = {
     "DESCOBERTA_PLANETA": {"risco": 0.5, "consumo_eter": 30, "recompensa_xp": 250},
     "ATAQUE_TOTAL": {"risco": 0.8, "consumo_eter": 40, "recompensa_xp": 400}
 }
-SENHA_BASE = "edson4020SS" # Base para geração do código de confirmação
+
+# Carrega as variáveis de ambiente (se o arquivo .env existir)
+load_dotenv()
+SENHA_BASE = os.getenv("SENHA_BASE") # Base para geração do código de confirmação
 
 def rank_xp(xp):
     """Calcula o Rank de poder (F, E, C, B, A, S, Lenda) baseado na XP total."""
@@ -357,6 +362,12 @@ class IA_NPC:
 
 # 7. --- TESTE E EXECUÇÃO SIMULADA ---
 if __name__ == "__main__":
+
+    # 🛡️ SENTINEL: CRITICAL SECURITY CHECK
+    if not SENHA_BASE:
+        print("\u001B[91m[CRITICAL] A variável de ambiente SENHA_BASE não está definida. O sistema não pode operar de forma segura.\u001B[0m")
+        print("             Por favor, crie um arquivo .env e defina SENHA_BASE com um valor seguro e único.")
+        exit(1) # Termina a execução
 
     print("==== SUPREMO RPG AI: INÍCIO DA EXECUÇÃO (DEMO CONCEITUAL) ====")
 
