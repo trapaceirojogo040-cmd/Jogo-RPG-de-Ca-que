@@ -96,6 +96,25 @@ def frase_log(entidade, acao, sucesso=True, cor="\u001B[92m"):
     cargo = entidade.cargo if hasattr(entidade, 'cargo') else 'Sistema'
     return f"{cor}[{nome}-{cargo}] {acao} - {status}\u001B[0m"
 
+def formatar_dicionario(dados: Dict[str, Any], titulo: str) -> str:
+    """Formata um dicionário como uma ficha de status colorida e organizada."""
+    # Cores ANSI
+    cor_titulo = "\u001B[95m"  # Magenta
+    cor_chave = "\u001B[96m"   # Ciano
+    cor_valor = "\u001B[93m"  # Amarelo
+    reset_cor = "\u001B[0m"
+
+    # Calcula o preenchimento com base na chave mais longa
+    max_len = max(len(chave) for chave in dados.keys()) if dados else 0
+
+    # Monta a string de saída
+    saida = f"{cor_titulo}--- {titulo.upper()} ---\n"
+    for chave, valor in dados.items():
+        padding = " " * (max_len - len(chave))
+        saida += f" {cor_chave}{chave}{reset_cor}:{padding} {cor_valor}{valor}{reset_cor}\n"
+    saida += f"{cor_titulo}--------------------{reset_cor}"
+    return saida
+
 # 3. --- OBJETOS DO JOGO (RPG CORE) ---
 class Personagem:
     """Representa uma Unidade, NPC ou Jogador (Base de RPG)."""
@@ -147,13 +166,14 @@ class Personagem:
             return frase_log(self, "subiu de nível! Poder Tático Aumentado!")
         return frase_log(self, f"XP insuficiente ({int(self.xp)}/{int(xp_necessario)})", False, "\u001B[91m")
 
-    def ficha(self):
+    def ficha(self) -> str:
         """Retorna o resumo do personagem."""
-        return {
+        dados = {
             "Nome": self.nome, "Cargo": self.cargo, "Raça": self.raca, "Classe": self.classe,
             "PV": self.pv, "XP": self.xp, "Ouro": self.ouro,
             "Rank": self.rank, "Nível": self.nivel
         }
+        return formatar_dicionario(dados, titulo=f"Ficha de {self.nome}")
 
 # 4. --- MÓDULO DE COMANDO E PROTOCOLO (Confirmação Militar) ---
 class ProtocoloDeComando:
@@ -293,13 +313,14 @@ class BaseMilitar:
         print(frase_log(self, f"Status '{novo_status}' inválido.", sucesso=False, cor="\u001B[91m"))
         return False
 
-    def status(self):
+    def status(self) -> str:
         """Retorna o status detalhado da Base."""
-        return {
+        dados = {
             "Base": self.nome, "Comandante": self.comandante.nome,
             "Recursos": self.recursos, "Nível Tecnológico": self.sistema_tec.nivel,
             "Status da Rede": self.rede.status_rede
         }
+        return formatar_dicionario(dados, titulo=f"Status da {self.nome}")
 
 # 6. --- AI ANALYTICS & NPC (Utility AI) ---
 class IA_NPC:
@@ -347,13 +368,14 @@ class IA_NPC:
         del scores["cura"] # Já foi avaliada
         return max(scores, key=scores.get) if scores else "explorar"
 
-    def analisar(self, personagem: Personagem) -> Dict[str, Any]:
+    def analisar(self, personagem: Personagem) -> str:
         """Gera uma análise completa do perfil do personagem (Análise e Teste)."""
         perfil = "Agressivo" if personagem.xp > 500 else "Neutro"
-        return {"Nome": personagem.nome,"Cargo": personagem.cargo,"Perfil": perfil,
+        dados = {"Nome": personagem.nome,"Cargo": personagem.cargo,"Perfil": perfil,
                 "Raça/Classe": f"{personagem.raca} / {personagem.classe}",
                 "Poder Tático (Hierarquia)": personagem.nivel * (1 + CARGOS.index(personagem.cargo)/5),
                 "Rank de XP": personagem.rank}
+        return formatar_dicionario(dados, titulo=f"Análise de IA de {personagem.nome}")
 
 # 7. --- TESTE E EXECUÇÃO SIMULADA ---
 if __name__ == "__main__":
