@@ -73,11 +73,15 @@ SENHA_BASE = "edson4020SS" # Base para geração do código de confirmação
 
 def rank_xp(xp):
     """Calcula o Rank de poder (F, E, C, B, A, S, Lenda) baseado na XP total."""
-    limites = [100, 500, 2500, 8000, 30000, 70000, 99999999]
-    tags = ['F', 'E', 'C', 'B', 'A', 'S', 'Lenda']
-    for i, v in enumerate(limites):
-        if xp < v: return tags[i]
-    return tags[-1]
+    # ⚡ Bolt: Replaced loop with a direct if/elif/else chain.
+    # This is more performant for a fixed number of thresholds as it avoids list iteration.
+    if xp < 100: return 'F'
+    if xp < 500: return 'E'
+    if xp < 2500: return 'C'
+    if xp < 8000: return 'B'
+    if xp < 30000: return 'A'
+    if xp < 70000: return 'S'
+    return 'Lenda'
 
 class ContaUsuario:
     """Classe simples para simular autenticação do OWNER."""
