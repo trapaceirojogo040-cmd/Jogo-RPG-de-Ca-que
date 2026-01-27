@@ -96,6 +96,13 @@ def frase_log(entidade, acao, sucesso=True, cor="\u001B[92m"):
     cargo = entidade.cargo if hasattr(entidade, 'cargo') else 'Sistema'
     return f"{cor}[{nome}-{cargo}] {acao} - {status}\u001B[0m"
 
+def exibir_dict_formatado(titulo: str, dados: Dict[str, Any]):
+    """Exibe um dicionário com formatação e cores para melhor UX."""
+    print(f"\n\u001B[95m--- {titulo.upper()} ---\u001B[0m")
+    max_len = max(len(k) for k in dados.keys()) if dados else 0
+    for chave, valor in dados.items():
+        print(f"  \u001B[96m{chave.ljust(max_len)}\u001B[0m : \u001B[93m{valor}\u001B[0m")
+
 # 3. --- OBJETOS DO JOGO (RPG CORE) ---
 class Personagem:
     """Representa uma Unidade, NPC ou Jogador (Base de RPG)."""
@@ -378,9 +385,8 @@ if __name__ == "__main__":
     agente_inativo = Personagem("Inativo", cargo="Jogador")
     storage.logins[agente_inativo.id] = datetime.now() - timedelta(days=31)
 
-    print("\n--- STATUS DE HIERARQUIA E BASE ---")
-    print(base.status())
-    print(proprietario.ficha())
+    exibir_dict_formatado("Status da Base", base.status())
+    exibir_dict_formatado(f"Ficha de {proprietario.nome}", proprietario.ficha())
 
     # 2. CICLO TECNOLOGIA E COMPORTAMENTO
     print("\n--- CICLO: TECNOLOGIA E COMPORTAMENTO ---")
