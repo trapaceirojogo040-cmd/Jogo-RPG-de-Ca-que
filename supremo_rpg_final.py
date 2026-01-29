@@ -89,6 +89,18 @@ class ContaUsuario:
 OWNER = ContaUsuario("caiquesanto674@gmail.com", SENHA_BASE, "OWNER")
 
 # 2. --- FEEDBACK EM COR (LOGS) ---
+def formatar_bloco_info(titulo: str, dados: Dict[str, Any]):
+    """Formata e exibe um bloco de informações com título e cores."""
+    print(f"\n\u001B[95m--- {titulo.upper()} ---\u001B[0m")
+    if not dados:
+        print("  (Nenhuma informação disponível)")
+        return
+
+    max_len = max(len(str(k)) for k in dados.keys()) if dados else 0
+
+    for chave, valor in dados.items():
+        print(f"  \u001B[96m{str(chave).ljust(max_len)}\u001B[0m : {valor}")
+
 def frase_log(entidade, acao, sucesso=True, cor="\u001B[92m"):
     """Gera mensagens de log coloridas para melhor feedback."""
     status = "SUCESSO" if sucesso else "FALHA"
@@ -378,9 +390,8 @@ if __name__ == "__main__":
     agente_inativo = Personagem("Inativo", cargo="Jogador")
     storage.logins[agente_inativo.id] = datetime.now() - timedelta(days=31)
 
-    print("\n--- STATUS DE HIERARQUIA E BASE ---")
-    print(base.status())
-    print(proprietario.ficha())
+    formatar_bloco_info("Status da Base", base.status())
+    formatar_bloco_info(f"Ficha de {proprietario.nome}", proprietario.ficha())
 
     # 2. CICLO TECNOLOGIA E COMPORTAMENTO
     print("\n--- CICLO: TECNOLOGIA E COMPORTAMENTO ---")
@@ -400,7 +411,7 @@ if __name__ == "__main__":
 
     # 5. TESTE DE DECISÃO DA AI
     print("\n--- ANÁLISE E DECISÃO DA AI (UTILITY SCORING) ---")
-    print(ai.analisar(vilao_inimigo))
+    formatar_bloco_info(f"Análise de {vilao_inimigo.nome}", ai.analisar(vilao_inimigo))
 
     vilao_inimigo.pv = 15 # Deixa o vilão fraco para a AI decidir
     decisao = ai.decidir_acao_npc(vilao_inimigo, proprietario) # AI decide a ação do vilão
