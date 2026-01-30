@@ -6,8 +6,20 @@ import random
 import uuid
 import math
 import hashlib
+import os
 from datetime import datetime, timedelta
 from typing import Dict, List, Any
+from dotenv import load_dotenv
+
+# Carregar variáveis de ambiente
+load_dotenv()
+
+# 🛡️ SENTINEL: Verificação crítica de segurança ao iniciar a aplicação
+if not os.getenv("SENHA_BASE"):
+    print("\u001B[91m🛡️ SENTINEL: ERRO CRÍTICO - A variável de ambiente 'SENHA_BASE' não foi carregada.\u001B[0m")
+    print("Certifique-se de que o arquivo .env existe e contém a chave 'SENHA_BASE'.")
+    import sys
+    sys.exit(1)
 
 # 1. --- MÓDULO DE SEGURANÇA E PODER PSICOLÓGICO ---
 class ProtocoloDePoder:
@@ -69,7 +81,8 @@ ACOES_MILITARES = {
     "DESCOBERTA_PLANETA": {"risco": 0.5, "consumo_eter": 30, "recompensa_xp": 250},
     "ATAQUE_TOTAL": {"risco": 0.8, "consumo_eter": 40, "recompensa_xp": 400}
 }
-SENHA_BASE = "edson4020SS" # Base para geração do código de confirmação
+# 🛡️ SENTINEL: Carregamento seguro da senha base via variável de ambiente
+SENHA_BASE = os.getenv("SENHA_BASE")
 
 def rank_xp(xp):
     """Calcula o Rank de poder (F, E, C, B, A, S, Lenda) baseado na XP total."""
@@ -86,7 +99,8 @@ class ContaUsuario:
         self.senha = senha
         self.cargo = cargo
 
-OWNER = ContaUsuario("caiquesanto674@gmail.com", SENHA_BASE, "OWNER")
+# 🛡️ SENTINEL: Carregamento seguro do email do proprietário via variável de ambiente
+OWNER = ContaUsuario(os.getenv("EMAIL_PROPRIETARIO"), SENHA_BASE, "OWNER")
 
 # 2. --- FEEDBACK EM COR (LOGS) ---
 def frase_log(entidade, acao, sucesso=True, cor="\u001B[92m"):
