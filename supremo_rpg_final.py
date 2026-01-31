@@ -18,7 +18,7 @@ class ProtocoloDePoder:
         self.habilidades = self._set_habilidades(cargo)
 
     def _set_habilidades(self, cargo: str) -> Dict[str, str]:
-        if "OWNER" in cargo or "Comandante" in cargo:
+        if "PROPRIETÁRIO" in cargo or "Comandante" in cargo:
             self.volicao_level = 999
             self.sinergia_moral = 1.5
             return {
@@ -48,7 +48,7 @@ CLASSES = ['Guerreiro', 'Mago', 'Comandante', 'Engenheiro', 'Assassino', 'Espada
 RACAS = ['Humano', 'Elfo', 'Orc', 'Demônio', 'Androide', 'IA']
 ARMAS = ['Espada Laser', 'Fuzil de Plasma', 'Varinha Arcana', 'Canhão Orbital']
 TECNOLOGIAS = ['Campo de Força Quântico', 'Nanobots de Reparo', 'Bombardeio Orbital', 'Teleportador Tático', 'IA Defensiva']
-CARGOS = ['OWNER', 'Administrador', 'Diretor', 'Master GM', 'Game Master', 'Moderador', 'Jogador']
+CARGOS = ['PROPRIETÁRIO', 'Administrador', 'Diretor', 'Master GM', 'Game Master', 'Moderador', 'Jogador']
 
 # Definições de Comportamento Militar
 PHRASES_MILITARES: Dict[str, str] = {
@@ -71,8 +71,8 @@ ACOES_MILITARES = {
 }
 SENHA_BASE = "edson4020SS" # Base para geração do código de confirmação
 
-def rank_xp(xp):
-    """Calcula o Rank de poder (F, E, C, B, A, S, Lenda) baseado na XP total."""
+def patente_xp(xp):
+    """Calcula a Patente de poder (F, E, C, B, A, S, Lenda) baseado na XP total."""
     limites = [100, 500, 2500, 8000, 30000, 70000, 99999999]
     tags = ['F', 'E', 'C', 'B', 'A', 'S', 'Lenda']
     for i, v in enumerate(limites):
@@ -86,15 +86,45 @@ class ContaUsuario:
         self.senha = senha
         self.cargo = cargo
 
-OWNER = ContaUsuario("caiquesanto674@gmail.com", SENHA_BASE, "OWNER")
+OWNER_CONTA = ContaUsuario("caiquesanto674@gmail.com", SENHA_BASE, "PROPRIETÁRIO")
 
-# 2. --- FEEDBACK EM COR (LOGS) ---
-def frase_log(entidade, acao, sucesso=True, cor="\u001B[92m"):
+# 2. --- UI, CORES E FEEDBACK ---
+class Cores:
+    RESET = "\u001B[0m"
+    NEGRITO = "\u001B[1m"
+    VERMELHO = "\u001B[91m"
+    VERDE = "\u001B[92m"
+    AMARELO = "\u001B[93m"
+    AZUL = "\u001B[94m"
+    MAGENTA = "\u001B[95m"
+    CIANO = "\u001B[96m"
+    CINZA = "\u001B[90m"
+
+def exibir_painel(titulo: str, dados: Dict[str, Any]):
+    """Exibe um painel formatado com cores para dados estruturados."""
+    if not dados:
+        print(f"{Cores.CINZA}[Painel {titulo} vazio]{Cores.RESET}")
+        return
+    print(f"\n{Cores.MAGENTA}{Cores.NEGRITO}=== {titulo.upper()} ==={Cores.RESET}")
+    for chave, valor in dados.items():
+        cor = Cores.AZUL
+        chave_up = chave.upper()
+        if chave_up in ["PV", "VIDA", "SAÚDE"]: cor = Cores.VERMELHO
+        elif chave_up in ["OURO", "ÉTER", "RECURSOS", "MOEDA"]: cor = Cores.AMARELO
+        elif chave_up in ["NÍVEL", "RANK", "PATENTE", "XP", "EXPERIÊNCIA"]: cor = Cores.VERDE
+        if isinstance(valor, dict):
+            print(f"{cor}{chave}:{Cores.RESET}")
+            for k, v in valor.items(): print(f"  {cor}- {k}: {v}{Cores.RESET}")
+        else: print(f"{cor}{chave}: {valor}{Cores.RESET}")
+    print(f"{Cores.MAGENTA}{'=' * (len(titulo) + 8)}{Cores.RESET}")
+
+def frase_log(entidade, acao, sucesso=True, cor=None):
     """Gera mensagens de log coloridas para melhor feedback."""
+    cor = cor or Cores.VERDE
     status = "SUCESSO" if sucesso else "FALHA"
     nome = entidade.nome if hasattr(entidade, 'nome') else 'Sistema'
     cargo = entidade.cargo if hasattr(entidade, 'cargo') else 'Sistema'
-    return f"{cor}[{nome}-{cargo}] {acao} - {status}\u001B[0m"
+    return f"{cor}[{nome}-{cargo}] {acao} - {status}{Cores.RESET}"
 
 # 3. --- OBJETOS DO JOGO (RPG CORE) ---
 class Personagem:
@@ -106,12 +136,12 @@ class Personagem:
         self.raca = raca or random.choice(RACAS)
         self.classe = classe or random.choice(CLASSES)
         self.poderes = ProtocoloDePoder(cargo)
-        # Bônus para OWNER (Hierarquia e Poder)
-        self.pv = 1200 if cargo == "OWNER" else 100
-        self.mana = 900 if cargo == "OWNER" else 50
+        # Bônus para PROPRIETÁRIO (Hierarquia e Poder)
+        self.pv = 1200 if cargo == "PROPRIETÁRIO" else 100
+        self.mana = 900 if cargo == "PROPRIETÁRIO" else 50
         self.xp = 0
         self.nivel = 1
-        self.rank = 'F'
+        self.patente = 'F'
         self.ouro = random.randint(2000, 8000)
         self.arma = random.choice(ARMAS)
         self.vivo = True
@@ -142,17 +172,17 @@ class Personagem:
         if self.xp >= xp_necessario:
             self.nivel += 1
             self.pv = int(self.pv * 1.2) # Aumento de 20% de PV por nível
-            self.rank = rank_xp(self.xp)
-            self.historico.append(f"Subiu para nível {self.nivel} (Rank {self.rank})")
+            self.patente = patente_xp(self.xp)
+            self.historico.append(f"Subiu para nível {self.nivel} (Patente {self.patente})")
             return frase_log(self, "subiu de nível! Poder Tático Aumentado!")
-        return frase_log(self, f"XP insuficiente ({int(self.xp)}/{int(xp_necessario)})", False, "\u001B[91m")
+        return frase_log(self, f"XP insuficiente ({int(self.xp)}/{int(xp_necessario)})", False, Cores.VERMELHO)
 
     def ficha(self):
         """Retorna o resumo do personagem."""
         return {
             "Nome": self.nome, "Cargo": self.cargo, "Raça": self.raca, "Classe": self.classe,
             "PV": self.pv, "XP": self.xp, "Ouro": self.ouro,
-            "Rank": self.rank, "Nível": self.nivel
+            "Patente": self.patente, "Nível": self.nivel
         }
 
 # 4. --- MÓDULO DE COMANDO E PROTOCOLO (Confirmação Militar) ---
@@ -177,13 +207,13 @@ class ProtocoloDeComando:
 
         custo_eter = ACOES_MILITARES[acao]["consumo_eter"]
         if base_militar.recursos["Éter"] < custo_eter:
-            print(frase_log(base_militar, f"Recursos Éter insuficientes ({custo_eter}) para {acao}.", False, "\u001B[91m"))
+            print(frase_log(base_militar, f"Recursos Éter insuficientes ({custo_eter}) para {acao}.", False, Cores.VERMELHO))
             return False
 
         nivel_tec = base_militar.sistema_tec.nivel
         codigo_esperado = self.gerar_codigo_confirmacao(acao, nivel_tec, emissor.cargo, base_militar.status_comportamento)
 
-        if emissor.cargo == 'OWNER' or codigo_inserido == codigo_esperado:
+        if emissor.cargo == 'PROPRIETÁRIO' or codigo_inserido == codigo_esperado:
             base_militar.recursos["Éter"] -= custo_eter
             emissor.xp += ACOES_MILITARES[acao]["recompensa_xp"]
 
@@ -193,15 +223,15 @@ class ProtocoloDeComando:
 
             if random.random() > fator_risco:
                 base_militar.forca_belica += 200
-                print(frase_log(emissor, f"Operação '{acao}' bem-sucedida! Força bélica aumentada.", True, "\u001B[96m"))
+                print(frase_log(emissor, f"Operação '{acao}' bem-sucedida! Força bélica aumentada.", True, Cores.CIANO))
             else:
                 base_militar.forca_belica -= 50
-                print(frase_log(emissor, f"Operação '{acao}' teve perdas. Força bélica reduzida.", False, "\u001B[91m"))
+                print(frase_log(emissor, f"Operação '{acao}' teve perdas. Força bélica reduzida.", False, Cores.VERMELHO))
 
             print(f"  > Nova Força Bélica da Base '{base_militar.nome}': {base_militar.forca_belica}")
             return True
         else:
-            print(f"\u001B[91m[PROTOCOLO NEGADO] Código Inválido. Nível Tec: {nivel_tec}. (Esperado: {codigo_esperado})\u001B[0m")
+            print(f"{Cores.VERMELHO}[PROTOCOLO NEGADO] Código Inválido. Nível Tec: {nivel_tec}. (Esperado: {codigo_esperado}){Cores.RESET}")
             return False
 
 # 5. --- ESTRUTURAS DO JOGO: ECONOMIA, TECNOLOGIA, REDE E BASE ---
@@ -231,7 +261,7 @@ class Economia:
             self.mercado[recurso] -= qtd
             txt = f"comprou {qtd} de {recurso} por {total} Ouro. Preço/Un: {preco_final}"
             return frase_log(jogador, txt)
-        return frase_log(jogador, "Ouro insuficiente", False, "\u001B[91m")
+        return frase_log(jogador, "Ouro insuficiente", False, Cores.VERMELHO)
 
 class Tecnologia:
     """Gerencia a progressão tecnológica (Análise e Teste)."""
@@ -249,9 +279,9 @@ class Tecnologia:
 
             if tecnologia == 'IA Defensiva Quântica':
                 jogador.pv += 500 # Aumento de poder tático do comandante
-                print(frase_log(jogador, f"Tecnologia {tecnologia} desbloqueada! Comandante PV +500", True, "\u001B[93m"))
-            return frase_log(jogador, f"Tecnologia {tecnologia} desbloqueada (Nível {self.nivel})!", True, "\u001B[93m")
-        return frase_log(jogador, f"Éter insuficiente (custo: {custo_eter})", False, "\u001B[91m")
+                print(frase_log(jogador, f"Tecnologia {tecnologia} desbloqueada! Comandante PV +500", True, Cores.AMARELO))
+            return frase_log(jogador, f"Tecnologia {tecnologia} desbloqueada (Nível {self.nivel})!", True, Cores.AMARELO)
+        return frase_log(jogador, f"Éter insuficiente (custo: {custo_eter})", False, Cores.VERMELHO)
 
 class RedeUniversal:
     """Simula a conectividade e segurança da base (Análise e Teste)."""
@@ -270,7 +300,7 @@ class RedeUniversal:
             self.status_rede = "Vulnerável (Nível F)"
 
         self.satelites_ativos = 3 + (nivel_tecnologico * 2)
-        print(frase_log(self, f"Rede atualizada. Status: {self.status_rede}", True, "\u001B[94m"))
+        print(frase_log(self, f"Rede atualizada. Status: {self.status_rede}", True, Cores.AZUL))
 
 class BaseMilitar:
     """O Hub central do jogo (Tycoon/Gerenciamento)."""
@@ -288,9 +318,9 @@ class BaseMilitar:
         """Altera o comportamento da base (AGRESSIVO/DEFENSIVO/NEUTRO)."""
         if novo_status in COMPORTAMENTO_STATUS:
             self.status_comportamento = novo_status
-            print(frase_log(self, f"Comportamento alterado para: {self.status_comportamento}", cor="\u001B[93m"))
+            print(frase_log(self, f"Comportamento alterado para: {self.status_comportamento}", cor=Cores.AMARELO))
             return True
-        print(frase_log(self, f"Status '{novo_status}' inválido.", sucesso=False, cor="\u001B[91m"))
+        print(frase_log(self, f"Status '{novo_status}' inválido.", sucesso=False, cor=Cores.VERMELHO))
         return False
 
     def status(self):
@@ -303,8 +333,8 @@ class BaseMilitar:
 
 # 6. --- AI ANALYTICS & NPC (Utility AI) ---
 class IA_NPC:
-    """IA de suporte e análise, usando Utility Scoring para decisões táticas."""
-    def __init__(self, nome='AI Suprema'):
+    """IA de suporte e análise, usando Pontuação de Utilidade para decisões táticas."""
+    def __init__(self, nome='IA Suprema'):
         self.nome = nome
 
     @staticmethod
@@ -353,15 +383,15 @@ class IA_NPC:
         return {"Nome": personagem.nome,"Cargo": personagem.cargo,"Perfil": perfil,
                 "Raça/Classe": f"{personagem.raca} / {personagem.classe}",
                 "Poder Tático (Hierarquia)": personagem.nivel * (1 + CARGOS.index(personagem.cargo)/5),
-                "Rank de XP": personagem.rank}
+                "Patente de XP": personagem.patente}
 
 # 7. --- TESTE E EXECUÇÃO SIMULADA ---
 if __name__ == "__main__":
 
-    print("==== SUPREMO RPG AI: INÍCIO DA EXECUÇÃO (DEMO CONCEITUAL) ====")
+    print(f"==== {Cores.CIANO}SUPREMO RPG IA: INÍCIO DA EXECUÇÃO (DEMO CONCEITUAL){Cores.RESET} ====")
 
     # 1. SETUP INICIAL
-    proprietario = Personagem("Caíque", cargo="OWNER")
+    proprietario = Personagem("Caíque", cargo="PROPRIETÁRIO")
     tec = Tecnologia()
     eco = Economia(tec)
     protocolo = ProtocoloDeComando()
@@ -379,8 +409,8 @@ if __name__ == "__main__":
     storage.logins[agente_inativo.id] = datetime.now() - timedelta(days=31)
 
     print("\n--- STATUS DE HIERARQUIA E BASE ---")
-    print(base.status())
-    print(proprietario.ficha())
+    exibir_painel("Status da Base", base.status())
+    exibir_painel("Ficha do Comandante", proprietario.ficha())
 
     # 2. CICLO TECNOLOGIA E COMPORTAMENTO
     print("\n--- CICLO: TECNOLOGIA E COMPORTAMENTO ---")
@@ -391,19 +421,19 @@ if __name__ == "__main__":
     print("\n--- CICLO: PROTOCOLO MILITAR ---")
     acao_alvo = "ATAQUE_TOTAL"
     codigo_npc_correto = protocolo.gerar_codigo_confirmacao(acao_alvo, tec.nivel, npc_diretor.cargo, base.status_comportamento)
-    print(f"\u001B[90m[DEBUG] Código de Confirmação para '{acao_alvo}': {codigo_npc_correto}\u001B[0m")
+    print(f"{Cores.CINZA}[DEBUG] Código de Confirmação para '{acao_alvo}': {codigo_npc_correto}{Cores.RESET}")
     protocolo.validar_operacao_militar(npc_diretor, acao_alvo, codigo_npc_correto, base)
 
     # 4. CICLO DE SEGURANÇA (ENTROPIA)
     print("\n--- CICLO: SEGURANÇA E ENTROPIA ---")
     storage.execute_entropy_protocol()
 
-    # 5. TESTE DE DECISÃO DA AI
-    print("\n--- ANÁLISE E DECISÃO DA AI (UTILITY SCORING) ---")
-    print(ai.analisar(vilao_inimigo))
+    # 5. TESTE DE DECISÃO DA IA
+    print(f"\n--- ANÁLISE E DECISÃO DA IA ({Cores.VERDE}PONTUAÇÃO DE UTILIDADE{Cores.RESET}) ---")
+    exibir_painel("Análise do Inimigo", ai.analisar(vilao_inimigo))
 
-    vilao_inimigo.pv = 15 # Deixa o vilão fraco para a AI decidir
-    decisao = ai.decidir_acao_npc(vilao_inimigo, proprietario) # AI decide a ação do vilão
-    print(f"AI decide para {vilao_inimigo.nome} (PV 15): {decisao.upper()}")
+    vilao_inimigo.pv = 15 # Deixa o vilão fraco para a IA decidir
+    decisao = ai.decidir_acao_npc(vilao_inimigo, proprietario) # IA decide a ação do vilão
+    print(f"IA decide para {vilao_inimigo.nome} (PV 15): {decisao.upper()}")
 
     print("\n==== EXECUÇÃO SIMULADA FINALIZADA ====")
