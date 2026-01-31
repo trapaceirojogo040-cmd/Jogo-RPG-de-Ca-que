@@ -1,0 +1,3 @@
+## 2024-05-15 - [Painéis Estruturados no CLI]
+**Learning:** In CLI applications, printing raw dictionaries significantly degrades UX. A reusable `exibir_painel` function with themed color coding (Red for health, Yellow for resources, Green for progress, Blue for status) dramatically improves data readability and immersion. Handling empty inputs gracefully in these functions prevents runtime crashes and maintains a polished feel.
+**Action:** Always implement a structured display pattern for complex data objects in CLI tools to avoid "wall of text" or "raw data" fatigue. Ensure the display function is robust against empty or malformed data.
