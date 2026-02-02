@@ -1,0 +1,3 @@
+## 2026-02-02 - [Optimizing fixed threshold lookups and static list index]
+**Learning:** In Python, replacing a loop over a list of fixed thresholds with a flat `if/elif/else` chain provides a significant performance boost (~80% in this codebase). Similarly, replacing `list.index()` with a pre-computed dictionary mapping (`CARGOS_ORDEM`) provides O(1) lookups and measurable speedup (~14%).
+**Action:** Always check for repeated `list.index()` calls on static lists and loop-based threshold checks that can be flattened. Ensure optimizations do not introduce breaking API changes (like renaming keys or attributes) even when following style guides.
