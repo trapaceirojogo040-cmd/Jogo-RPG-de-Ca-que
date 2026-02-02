@@ -6,8 +6,34 @@ import random
 import uuid
 import math
 import hashlib
+import os
 from datetime import datetime, timedelta
 from typing import Dict, List, Any
+from dotenv import load_dotenv
+
+# Carregar variáveis de ambiente
+load_dotenv()
+
+class Cores:
+    """🛡️ SENTINEL: Códigos ANSI para cores no terminal."""
+    VERDE = "\u001B[92m"
+    VERMELHO = "\u001B[91m"
+    AMARELO = "\u001B[93m"
+    AZUL = "\u001B[94m"
+    MAGENTA = "\u001B[95m"
+    CIANO = "\u001B[96m"
+    RESET = "\u001B[0m"
+    CINZA = "\u001B[90m"
+
+def verificar_inicializacao():
+    """🛡️ SENTINEL: Verifica se as variáveis de ambiente críticas foram carregadas."""
+    if not os.getenv("SENHA_BASE") or not os.getenv("EMAIL_PROPRIETARIO"):
+        print(f"{Cores.VERMELHO}[ERRO CRÍTICO] Falha na inicialização: Segredos ausentes (SENHA_BASE ou EMAIL_PROPRIETARIO).{Cores.RESET}")
+        print(f"{Cores.AMARELO}Certifique-se de que o arquivo .env está configurado corretamente seguindo o .env.example.{Cores.RESET}")
+        exit(1)
+
+# Executar verificação de segurança no startup
+verificar_inicializacao()
 
 # 1. --- MÓDULO DE SEGURANÇA E PODER PSICOLÓGICO ---
 class ProtocoloDePoder:
@@ -69,7 +95,8 @@ ACOES_MILITARES = {
     "DESCOBERTA_PLANETA": {"risco": 0.5, "consumo_eter": 30, "recompensa_xp": 250},
     "ATAQUE_TOTAL": {"risco": 0.8, "consumo_eter": 40, "recompensa_xp": 400}
 }
-SENHA_BASE = "edson4020SS" # Base para geração do código de confirmação
+# 🛡️ SENTINEL: Segredos carregados com segurança do ambiente
+SENHA_BASE = os.getenv("SENHA_BASE")
 
 def rank_xp(xp):
     """Calcula o Rank de poder (F, E, C, B, A, S, Lenda) baseado na XP total."""
@@ -86,15 +113,16 @@ class ContaUsuario:
         self.senha = senha
         self.cargo = cargo
 
-OWNER = ContaUsuario("caiquesanto674@gmail.com", SENHA_BASE, "OWNER")
+# 🛡️ SENTINEL: Email do proprietário carregado com segurança do ambiente
+OWNER = ContaUsuario(os.getenv("EMAIL_PROPRIETARIO"), SENHA_BASE, "OWNER")
 
 # 2. --- FEEDBACK EM COR (LOGS) ---
-def frase_log(entidade, acao, sucesso=True, cor="\u001B[92m"):
+def frase_log(entidade, acao, sucesso=True, cor=Cores.VERDE):
     """Gera mensagens de log coloridas para melhor feedback."""
     status = "SUCESSO" if sucesso else "FALHA"
     nome = entidade.nome if hasattr(entidade, 'nome') else 'Sistema'
     cargo = entidade.cargo if hasattr(entidade, 'cargo') else 'Sistema'
-    return f"{cor}[{nome}-{cargo}] {acao} - {status}\u001B[0m"
+    return f"{cor}[{nome}-{cargo}] {acao} - {status}{Cores.RESET}"
 
 # 3. --- OBJETOS DO JOGO (RPG CORE) ---
 class Personagem:
@@ -145,7 +173,7 @@ class Personagem:
             self.rank = rank_xp(self.xp)
             self.historico.append(f"Subiu para nível {self.nivel} (Rank {self.rank})")
             return frase_log(self, "subiu de nível! Poder Tático Aumentado!")
-        return frase_log(self, f"XP insuficiente ({int(self.xp)}/{int(xp_necessario)})", False, "\u001B[91m")
+        return frase_log(self, f"XP insuficiente ({int(self.xp)}/{int(xp_necessario)})", False, Cores.VERMELHO)
 
     def ficha(self):
         """Retorna o resumo do personagem."""
@@ -177,7 +205,7 @@ class ProtocoloDeComando:
 
         custo_eter = ACOES_MILITARES[acao]["consumo_eter"]
         if base_militar.recursos["Éter"] < custo_eter:
-            print(frase_log(base_militar, f"Recursos Éter insuficientes ({custo_eter}) para {acao}.", False, "\u001B[91m"))
+            print(frase_log(base_militar, f"Recursos Éter insuficientes ({custo_eter}) para {acao}.", False, Cores.VERMELHO))
             return False
 
         nivel_tec = base_militar.sistema_tec.nivel
@@ -193,15 +221,15 @@ class ProtocoloDeComando:
 
             if random.random() > fator_risco:
                 base_militar.forca_belica += 200
-                print(frase_log(emissor, f"Operação '{acao}' bem-sucedida! Força bélica aumentada.", True, "\u001B[96m"))
+                print(frase_log(emissor, f"Operação '{acao}' bem-sucedida! Força bélica aumentada.", True, Cores.CIANO))
             else:
                 base_militar.forca_belica -= 50
-                print(frase_log(emissor, f"Operação '{acao}' teve perdas. Força bélica reduzida.", False, "\u001B[91m"))
+                print(frase_log(emissor, f"Operação '{acao}' teve perdas. Força bélica reduzida.", False, Cores.VERMELHO))
 
             print(f"  > Nova Força Bélica da Base '{base_militar.nome}': {base_militar.forca_belica}")
             return True
         else:
-            print(f"\u001B[91m[PROTOCOLO NEGADO] Código Inválido. Nível Tec: {nivel_tec}. (Esperado: {codigo_esperado})\u001B[0m")
+            print(f"{Cores.VERMELHO}[PROTOCOLO NEGADO] Código Inválido. Nível Tec: {nivel_tec}. (Esperado: {codigo_esperado}){Cores.RESET}")
             return False
 
 # 5. --- ESTRUTURAS DO JOGO: ECONOMIA, TECNOLOGIA, REDE E BASE ---
@@ -231,7 +259,7 @@ class Economia:
             self.mercado[recurso] -= qtd
             txt = f"comprou {qtd} de {recurso} por {total} Ouro. Preço/Un: {preco_final}"
             return frase_log(jogador, txt)
-        return frase_log(jogador, "Ouro insuficiente", False, "\u001B[91m")
+        return frase_log(jogador, "Ouro insuficiente", False, Cores.VERMELHO)
 
 class Tecnologia:
     """Gerencia a progressão tecnológica (Análise e Teste)."""
@@ -249,9 +277,9 @@ class Tecnologia:
 
             if tecnologia == 'IA Defensiva Quântica':
                 jogador.pv += 500 # Aumento de poder tático do comandante
-                print(frase_log(jogador, f"Tecnologia {tecnologia} desbloqueada! Comandante PV +500", True, "\u001B[93m"))
-            return frase_log(jogador, f"Tecnologia {tecnologia} desbloqueada (Nível {self.nivel})!", True, "\u001B[93m")
-        return frase_log(jogador, f"Éter insuficiente (custo: {custo_eter})", False, "\u001B[91m")
+                print(frase_log(jogador, f"Tecnologia {tecnologia} desbloqueada! Comandante PV +500", True, Cores.AMARELO))
+            return frase_log(jogador, f"Tecnologia {tecnologia} desbloqueada (Nível {self.nivel})!", True, Cores.AMARELO)
+        return frase_log(jogador, f"Éter insuficiente (custo: {custo_eter})", False, Cores.VERMELHO)
 
 class RedeUniversal:
     """Simula a conectividade e segurança da base (Análise e Teste)."""
@@ -270,7 +298,7 @@ class RedeUniversal:
             self.status_rede = "Vulnerável (Nível F)"
 
         self.satelites_ativos = 3 + (nivel_tecnologico * 2)
-        print(frase_log(self, f"Rede atualizada. Status: {self.status_rede}", True, "\u001B[94m"))
+        print(frase_log(self, f"Rede atualizada. Status: {self.status_rede}", True, Cores.AZUL))
 
 class BaseMilitar:
     """O Hub central do jogo (Tycoon/Gerenciamento)."""
@@ -288,9 +316,9 @@ class BaseMilitar:
         """Altera o comportamento da base (AGRESSIVO/DEFENSIVO/NEUTRO)."""
         if novo_status in COMPORTAMENTO_STATUS:
             self.status_comportamento = novo_status
-            print(frase_log(self, f"Comportamento alterado para: {self.status_comportamento}", cor="\u001B[93m"))
+            print(frase_log(self, f"Comportamento alterado para: {self.status_comportamento}", cor=Cores.AMARELO))
             return True
-        print(frase_log(self, f"Status '{novo_status}' inválido.", sucesso=False, cor="\u001B[91m"))
+        print(frase_log(self, f"Status '{novo_status}' inválido.", sucesso=False, cor=Cores.VERMELHO))
         return False
 
     def status(self):
@@ -391,7 +419,7 @@ if __name__ == "__main__":
     print("\n--- CICLO: PROTOCOLO MILITAR ---")
     acao_alvo = "ATAQUE_TOTAL"
     codigo_npc_correto = protocolo.gerar_codigo_confirmacao(acao_alvo, tec.nivel, npc_diretor.cargo, base.status_comportamento)
-    print(f"\u001B[90m[DEBUG] Código de Confirmação para '{acao_alvo}': {codigo_npc_correto}\u001B[0m")
+    print(f"{Cores.CINZA}[DEBUG] Código de Confirmação para '{acao_alvo}': {codigo_npc_correto}{Cores.RESET}")
     protocolo.validar_operacao_militar(npc_diretor, acao_alvo, codigo_npc_correto, base)
 
     # 4. CICLO DE SEGURANÇA (ENTROPIA)
