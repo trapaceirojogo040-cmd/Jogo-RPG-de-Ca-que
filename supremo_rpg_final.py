@@ -2,12 +2,32 @@
 # Arquitetura Unificada de RPG de Estratégia, Hierarquia, Economia e Protocolo AI.
 # O foco é na interdependência dos módulos: Tecnologia afeta Protocolo e Economia.
 
+import os
+import sys
 import random
 import uuid
 import math
 import hashlib
 from datetime import datetime, timedelta
 from typing import Dict, List, Any
+from dotenv import load_dotenv
+
+# 🛡️ SENTINEL: Carregamento seguro de configurações e verificação de segredos.
+load_dotenv()
+
+def verificar_seguranca():
+    """🛡️ SENTINEL: Valida se os segredos críticos estão presentes no ambiente."""
+    segredos_obrigatorios = ["SENHA_BASE", "EMAIL_PROPRIETARIO"]
+    faltando = [s for s in segredos_obrigatorios if not os.getenv(s)]
+
+    if faltando:
+        # Usando ANSI codes diretamente para garantir visibilidade do erro crítico
+        print(f"\u001B[91m[ERRO DE SEGURANÇA] Variáveis de ambiente faltando: {', '.join(faltando)}")
+        print("O sistema não pode iniciar sem as credenciais base configuradas no arquivo .env.\u001B[0m")
+        sys.exit(1)
+
+# Executa a verificação imediatamente no startup
+verificar_seguranca()
 
 # 1. --- MÓDULO DE SEGURANÇA E PODER PSICOLÓGICO ---
 class ProtocoloDePoder:
@@ -69,7 +89,9 @@ ACOES_MILITARES = {
     "DESCOBERTA_PLANETA": {"risco": 0.5, "consumo_eter": 30, "recompensa_xp": 250},
     "ATAQUE_TOTAL": {"risco": 0.8, "consumo_eter": 40, "recompensa_xp": 400}
 }
-SENHA_BASE = "edson4020SS" # Base para geração do código de confirmação
+# 🛡️ SENTINEL: Carregamento de segredos via variáveis de ambiente
+SENHA_BASE = os.getenv("SENHA_BASE")
+EMAIL_PROPRIETARIO = os.getenv("EMAIL_PROPRIETARIO")
 
 def rank_xp(xp):
     """Calcula o Rank de poder (F, E, C, B, A, S, Lenda) baseado na XP total."""
@@ -86,7 +108,7 @@ class ContaUsuario:
         self.senha = senha
         self.cargo = cargo
 
-OWNER = ContaUsuario("caiquesanto674@gmail.com", SENHA_BASE, "OWNER")
+OWNER = ContaUsuario(EMAIL_PROPRIETARIO, SENHA_BASE, "OWNER")
 
 # 2. --- FEEDBACK EM COR (LOGS) ---
 def frase_log(entidade, acao, sucesso=True, cor="\u001B[92m"):
