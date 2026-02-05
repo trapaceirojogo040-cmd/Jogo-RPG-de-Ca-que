@@ -6,8 +6,16 @@ import random
 import uuid
 import math
 import hashlib
+import os
+from dotenv import load_dotenv
 from datetime import datetime, timedelta
 from typing import Dict, List, Any
+
+# Carregar variáveis de ambiente e realizar verificação Fail-Secure
+load_dotenv()
+if not os.getenv("SENHA_BASE") or not os.getenv("EMAIL_PROPRIETARIO"):
+    print("\033[91m[ERRO CRÍTICO]: Variáveis de ambiente SENHA_BASE ou EMAIL_PROPRIETARIO ausentes.\033[0m")
+    exit(1)
 
 # 1. --- MÓDULO DE SEGURANÇA E PODER PSICOLÓGICO ---
 class ProtocoloDePoder:
@@ -69,7 +77,7 @@ ACOES_MILITARES = {
     "DESCOBERTA_PLANETA": {"risco": 0.5, "consumo_eter": 30, "recompensa_xp": 250},
     "ATAQUE_TOTAL": {"risco": 0.8, "consumo_eter": 40, "recompensa_xp": 400}
 }
-SENHA_BASE = "edson4020SS" # Base para geração do código de confirmação
+SENHA_BASE = os.getenv("SENHA_BASE") # Base para geração do código de confirmação
 
 def rank_xp(xp):
     """Calcula o Rank de poder (F, E, C, B, A, S, Lenda) baseado na XP total."""
@@ -86,7 +94,7 @@ class ContaUsuario:
         self.senha = senha
         self.cargo = cargo
 
-OWNER = ContaUsuario("caiquesanto674@gmail.com", SENHA_BASE, "OWNER")
+OWNER = ContaUsuario(os.getenv("EMAIL_PROPRIETARIO"), SENHA_BASE, "OWNER")
 
 # 2. --- FEEDBACK EM COR (LOGS) ---
 def frase_log(entidade, acao, sucesso=True, cor="\u001B[92m"):
