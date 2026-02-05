@@ -9,6 +9,38 @@ import hashlib
 from datetime import datetime, timedelta
 from typing import Dict, List, Any
 
+# 0. --- CONFIGURAÇÃO DE UI E CORES (UX) ---
+class Cores:
+    """Códigos ANSI para cores no terminal para melhorar a UX."""
+    MAGENTA = "\033[95m"
+    AZUL = "\033[94m"
+    VERDE = "\033[92m"
+    AMARELO = "\033[93m"
+    VERMELHO = "\033[91m"
+    CIANO = "\033[96m"
+    CINZA = "\033[90m"
+    RESET = "\033[0m"
+
+def exibir_painel(titulo: str, dados: Dict[str, Any]):
+    """Exibe dados estruturados em um painel formatado e colorido (Micro-UX)."""
+    if not dados:
+        return
+    print(f"\n{Cores.MAGENTA}=== {titulo.upper()} ==={Cores.RESET}")
+    for chave, valor in dados.items():
+        cor = Cores.CIANO
+        if any(x in chave for x in ['PV', 'Saúde', 'Vida']): cor = Cores.VERMELHO
+        elif any(x in chave for x in ['Ouro', 'Éter', 'Recursos', 'Cristal']): cor = Cores.AMARELO
+        elif any(x in chave for x in ['Nível', 'Level', 'XP', 'Rank', 'Poder']): cor = Cores.VERDE
+        elif any(x in chave for x in ['Rede', 'Conectividade', 'Status']): cor = Cores.AZUL
+
+        if isinstance(valor, dict):
+            print(f"{cor}{chave}:{Cores.RESET}")
+            for k, v in valor.items():
+                print(f"  {Cores.CINZA}→ {k}: {v}{Cores.RESET}")
+        else:
+            print(f"{cor}{chave}: {Cores.RESET}{valor}")
+    print(f"{Cores.MAGENTA}{'=' * (len(titulo) + 8)}{Cores.RESET}")
+
 # 1. --- MÓDULO DE SEGURANÇA E PODER PSICOLÓGICO ---
 class ProtocoloDePoder:
     """Define a Volição e Sinergia dos personagens."""
@@ -89,12 +121,14 @@ class ContaUsuario:
 OWNER = ContaUsuario("caiquesanto674@gmail.com", SENHA_BASE, "OWNER")
 
 # 2. --- FEEDBACK EM COR (LOGS) ---
-def frase_log(entidade, acao, sucesso=True, cor="\u001B[92m"):
+def frase_log(entidade, acao, sucesso=True, cor=None):
     """Gera mensagens de log coloridas para melhor feedback."""
+    if cor is None:
+        cor = Cores.VERDE if sucesso else Cores.VERMELHO
     status = "SUCESSO" if sucesso else "FALHA"
     nome = entidade.nome if hasattr(entidade, 'nome') else 'Sistema'
     cargo = entidade.cargo if hasattr(entidade, 'cargo') else 'Sistema'
-    return f"{cor}[{nome}-{cargo}] {acao} - {status}\u001B[0m"
+    return f"{cor}[{nome}-{cargo}] {acao} - {status}{Cores.RESET}"
 
 # 3. --- OBJETOS DO JOGO (RPG CORE) ---
 class Personagem:
@@ -358,7 +392,7 @@ class IA_NPC:
 # 7. --- TESTE E EXECUÇÃO SIMULADA ---
 if __name__ == "__main__":
 
-    print("==== SUPREMO RPG AI: INÍCIO DA EXECUÇÃO (DEMO CONCEITUAL) ====")
+    print("==== SUPREMO RPG IA: INÍCIO DA EXECUÇÃO (DEMO CONCEITUAL) ====")
 
     # 1. SETUP INICIAL
     proprietario = Personagem("Caíque", cargo="OWNER")
@@ -379,8 +413,8 @@ if __name__ == "__main__":
     storage.logins[agente_inativo.id] = datetime.now() - timedelta(days=31)
 
     print("\n--- STATUS DE HIERARQUIA E BASE ---")
-    print(base.status())
-    print(proprietario.ficha())
+    exibir_painel("Status da Base", base.status())
+    exibir_painel("Ficha do Proprietário", proprietario.ficha())
 
     # 2. CICLO TECNOLOGIA E COMPORTAMENTO
     print("\n--- CICLO: TECNOLOGIA E COMPORTAMENTO ---")
@@ -398,9 +432,9 @@ if __name__ == "__main__":
     print("\n--- CICLO: SEGURANÇA E ENTROPIA ---")
     storage.execute_entropy_protocol()
 
-    # 5. TESTE DE DECISÃO DA AI
-    print("\n--- ANÁLISE E DECISÃO DA AI (UTILITY SCORING) ---")
-    print(ai.analisar(vilao_inimigo))
+    # 5. TESTE DE DECISÃO DA IA
+    print("\n--- ANÁLISE E DECISÃO DA IA (PONTUAÇÃO DE UTILIDADE) ---")
+    exibir_painel("Análise da IA", ai.analisar(vilao_inimigo))
 
     vilao_inimigo.pv = 15 # Deixa o vilão fraco para a AI decidir
     decisao = ai.decidir_acao_npc(vilao_inimigo, proprietario) # AI decide a ação do vilão
