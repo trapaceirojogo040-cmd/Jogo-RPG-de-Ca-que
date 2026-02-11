@@ -8,6 +8,9 @@ import math
 import hashlib
 from datetime import datetime, timedelta
 from typing import Dict, List, Any
+import os
+from dotenv import load_dotenv
+import sys
 
 # 1. --- MÓDULO DE SEGURANÇA E PODER PSICOLÓGICO ---
 class ProtocoloDePoder:
@@ -69,7 +72,15 @@ ACOES_MILITARES = {
     "DESCOBERTA_PLANETA": {"risco": 0.5, "consumo_eter": 30, "recompensa_xp": 250},
     "ATAQUE_TOTAL": {"risco": 0.8, "consumo_eter": 40, "recompensa_xp": 400}
 }
-SENHA_BASE = "edson4020SS" # Base para geração do código de confirmação
+
+# 🛡️ Sentinel: Carrega a SENHA_BASE de forma segura a partir de variáveis de ambiente.
+# Isso evita que segredos sejam expostos diretamente no código.
+load_dotenv()
+SENHA_BASE = os.getenv("SENHA_BASE")
+if not SENHA_BASE:
+    print("\u001B[91m[FALHA CRÍTICA DE SEGURANÇA] A variável de ambiente SENHA_BASE não está definida.")
+    print("Por favor, crie um arquivo .env e adicione SENHA_BASE='seu_segredo_aqui'.\u001B[0m")
+    sys.exit(1) # Impede a execução sem a configuração de segurança.
 
 def rank_xp(xp):
     """Calcula o Rank de poder (F, E, C, B, A, S, Lenda) baseado na XP total."""
